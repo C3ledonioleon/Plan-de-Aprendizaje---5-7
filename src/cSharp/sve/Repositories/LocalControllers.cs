@@ -1,68 +1,49 @@
-using System.Data;
-using Dapper;
-using MySql.Data.MySqlClient;
 using sve.Models;
 using sve.Repositories.Contracts;
-using Microsoft.Extensions.Configuration;
+using sve_api.Models;
 
 namespace sve.Repositories
 {
     public class LocalRepository : ILocalRepository
     {
-        private readonly IConfiguration _configuration;
+        private readonly SveContext sveContext;
 
         public LocalRepository(IConfiguration configuration)
         {
-            _configuration = configuration;
+    
+            this.sveContext = sveContext;
         }
-
-        private IDbConnection Connection => new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
         public List<Local> GetAll()
         {
-            using var db = Connection;
-            return db.Query<Local>("SELECT * FROM Local").ToList();
+            return sveContext.Local.ToList();
         }
 
         public Local? GetById(int id)
         {
-            using var db = Connection;
-            return db.QueryFirstOrDefault<Local>(
-                "SELECT * FROM Local WHERE IdLocal = @IdLocal",
-                new { IdLocal = id });
+            return sveContext.Local.FirstOrDefault(x => x.IdLocal == id);
         }
+
 
         public int Add(Local local)
         {
-            using var db = Connection;
-            string sql = @"
-                INSERT INTO Local (Nombre, Direccion, CapacidadTotal)
-                VALUES (@Nombre, @Direccion, @CapacidadTotal);
-                SELECT LAST_INSERT_ID();";
-            int newId = db.ExecuteScalar<int>(sql, local);
-            local.IdLocal = newId;
-            return newId;
+            sveContext.Local.Add(local);
+            sveContext.SaveChanges();
+            return local.IdLocal; // EF Core genera autom�ticamente el Id
         }
 
         public bool Update(int id, Local local)
         {
-            using var db = Connection;
-            string sql = @"
-                UPDATE Local 
-                SET Nombre = @Nombre,
-                    Direccion = @Direccion, 
-                    CapacidadTotal = @CapacidadTotal
-                WHERE IdLocal = @IdLocal";
-            int rows = db.Execute(sql, new { local.Nombre, local.Direccion, local.CapacidadTotal, IdLocal = id });
-            return rows > 0;
+            local.IdLocal = id;
+            sveContext.Local.Update(local);
+            return sveContext.SaveChanges() > 0;
         }
 
         public bool Delete(int id)
         {
-            using var db = Connection;
-            string sql = "DELETE FROM Local WHERE IdLocal = @IdLocal";
-            int rows = db.Execute(sql, new { IdLocal = id });
-            return rows > 0;
+            var local = sveContext.Funcion.FirstOrDefault(x => x.IdFuncion == id);
+            sveContext.Funcion.Remove(local);
+            return sveContext.SaveChanges() > 0;
         }
     }
 }

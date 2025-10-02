@@ -4,15 +4,18 @@ namespace sve.Models
     {
         public int IdEntrada { get; set; }
         public decimal Precio { get; set; }
+        public EstadoEntrada Estado { get; set; }
         public int IdOrden { get; set; }
         public int IdTarifa { get; set; }
-        public EstadoEntrada Estado { get; set; }
-        public int IdCliente { get; set; }    // <-- Agregar esta propiedad
-        public int IdFuncion { get; set; }  // <-- Agregar esta propiedad
-        public Entrada() 
-        { }
-    }
+        public int IdCliente { get; set; }
+        public int IdFuncion { get; set; }
 
+        public Orden Orden { get; set; }
+        public Tarifa Tarifa { get; set; }
+        public Funcion Funcion { get; set; }
+        public Cliente Cliente { get; set; }
+
+    }
     public enum EstadoEntrada
     {
         Activa,

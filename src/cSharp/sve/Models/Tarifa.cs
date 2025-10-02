@@ -10,9 +10,8 @@ namespace sve.Models
         public Funcion? Funcion { get; set; }
         public Sector? Sector { get; set; }
         public EstadoTarifa Estado { get; set; }
-        public List<Entrada> Entradas { get; set; } 
-        public Tarifa()
-        { }
+        public List<Entrada> Entradas { get; set; }
+        public List<Orden> Ordenes { get; set; }
     }
 
     public enum EstadoTarifa

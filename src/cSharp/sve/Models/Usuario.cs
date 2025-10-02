@@ -12,8 +12,8 @@ namespace sve.Models
         public required string Email {get; set; }
         public string contrasenia {get; set; }
         public RolUsuario Rol {get; set; }
-        public Usuario() 
-        { }
+   
+        public Cliente? Cliente {get; set; }
 
     }
     public enum RolUsuario

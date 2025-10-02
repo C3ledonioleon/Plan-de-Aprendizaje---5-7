@@ -1,69 +1,47 @@
-using System.Data;
-using Dapper;
-using MySql.Data.MySqlClient;
 using sve.Models;
 using sve.Repositories.Contracts;
-using sve.Services;
+using sve_api.Models;
 
 namespace sve.Repositories
 {
     public class EntradaRepository : IEntradaRepository
     {
-        private readonly IConfiguration _configuration;
+   
+        private readonly SveContext sveContext;
 
-        public EntradaRepository(IConfiguration configuration)
+        public EntradaRepository(SveContext sveContext)
         {
-            _configuration = configuration;
+              this .sveContext = sveContext;
         }
-
-        private IDbConnection Connection => new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
         public List<Entrada> GetAll()
         {
-            using var db = Connection;
-            return db.Query<Entrada>("SELECT * FROM Entrada").ToList();
+            return sveContext.Entrada.ToList();
         }
 
         public Entrada? GetById(int id)
         {
-            using var db = Connection;
-            return db.QueryFirstOrDefault<Entrada>(
-                "SELECT * FROM Entrada WHERE IdEntrada = @IdEntrada",
-                new { IdEntrada = id });
+            return sveContext.Entrada.FirstOrDefault(x => x.IdEntrada == id);
         }
 
         public int Add(Entrada entrada)
         {
-            using var db = Connection;
-            string sql = @"
-                INSERT INTO Entrada (Precio, IdCliente, IdFuncion)
-                VALUES (@Precio, @IdCliente, @IdFuncion);
-                SELECT LAST_INSERT_ID();";
-
-            int newId = db.ExecuteScalar<int>(sql, entrada);
-            entrada.IdEntrada = newId;
-            return newId;
+            sveContext.Entrada.Add(entrada);
+            sveContext.SaveChanges();
+            return entrada.IdEntrada;
         }
 
         public bool Update(int id, Entrada entrada)
         {
-            using var db = Connection;
-            string sql = @"
-                UPDATE Entrada 
-                SET Precio = @Precio,
-                IdOrden = @IdOrden,
-                IdTarifa = @IdTarifa,
-                Estado = @Estado
-                WHERE IdEntrada = @IdEntrada";
-            int rows = db.Execute(sql, new { entrada.Precio, entrada.IdOrden, entrada.IdTarifa, entrada.Estado , IdEntrada = id });
-            return rows > 0;
+            entrada.IdEntrada = id;
+            sveContext.Entrada.Update(entrada);
+            return sveContext.SaveChanges() > 0;
         }
         public bool Delete(int id)
         {
-            using var db = Connection;
-            string sql = "DELETE FROM Entrada WHERE IdEntrada = @IdEntrada";
-            int rows = db.Execute(sql, new { IdEntrada = id });
-            return rows > 0;
+            var entrada = sveContext.Entrada.FirstOrDefault(x => x.IdEntrada == id);
+            sveContext.Entrada.Remove(entrada);
+            return sveContext.SaveChanges() > 0;
         }
     }
 }

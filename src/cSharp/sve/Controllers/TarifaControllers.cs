@@ -18,10 +18,10 @@ namespace sve.Controllers
 
         // POST /tarifas — Crea una Tarifa
         [HttpPost]
-        public IActionResult CrearTarifa([FromBody] TarifaCreateDto dto)
+        public IActionResult CrearTarifa([FromBody] TarifaCreateDto tarifa)
         {
-            var id = _tarifaService.AgregarTarifa(dto);
-            return CreatedAtAction(nameof(ObtenerTarifa), new { tarifaId = id }, dto);
+            var id = _tarifaService.AgregarTarifa(tarifa);
+            return CreatedAtAction(nameof(ObtenerTarifa), new { tarifaId = id }, tarifa);
         }
 
         // GET /tarifas — Lista todas las tarifas
@@ -43,9 +43,9 @@ namespace sve.Controllers
 
         // PUT /tarifas/{tarifaId} — Actualiza precio, stock o estado
         [HttpPut("{tarifaId}")]
-        public IActionResult ActualizarTarifa(int tarifaId, [FromBody] TarifaUpdateDto dto)
+        public IActionResult ActualizarTarifa(int tarifaId, [FromBody] TarifaUpdateDto tarifa)
         {
-            var actualizado = _tarifaService.ActualizarTarifa(tarifaId, dto);
+            var actualizado = _tarifaService.ActualizarTarifa(tarifaId, tarifa);
             if (!actualizado) return NotFound();
             return NoContent();
         }

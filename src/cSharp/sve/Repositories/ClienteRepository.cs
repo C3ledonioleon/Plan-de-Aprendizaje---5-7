@@ -3,7 +3,6 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using sve.Models;
 using sve.Repositories.Contracts;
-using sve.Services;
 
 namespace sve.Repositories
 {

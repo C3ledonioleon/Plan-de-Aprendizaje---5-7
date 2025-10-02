@@ -17,10 +17,10 @@ namespace sve.Controllers
         }
 
         [HttpPost]
-        public IActionResult CrearLocal([FromBody] LocalCreateDto dto)
+        public IActionResult CrearLocal([FromBody] LocalCreateDto local)
         {
-            var id = _localService.AgregarLocal(dto);
-            return CreatedAtAction(nameof(ObtenerLocal), new { idLocal = id }, dto);
+            var id = _localService.AgregarLocal(local);
+            return CreatedAtAction(nameof(ObtenerLocal), new { idLocal = id }, local);
         }
 
         [HttpGet]
@@ -35,9 +35,9 @@ namespace sve.Controllers
         }
 
         [HttpPut("{idLocal}")]
-        public IActionResult ActualizarLocal(int idLocal, [FromBody] LocalUpdateDto dto)
+        public IActionResult ActualizarLocal(int idLocal, [FromBody] LocalUpdateDto local)
         {
-            var actualizado = _localService.ActualizarLocal(idLocal, dto);
+            var actualizado = _localService.ActualizarLocal(idLocal, local);
             if (!actualizado) return NotFound();
             return NoContent();
         }

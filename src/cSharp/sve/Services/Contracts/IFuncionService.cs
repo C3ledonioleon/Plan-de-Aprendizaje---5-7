@@ -6,7 +6,7 @@ namespace sve.Services.Contracts;
 
 public interface IFuncionService
 {
-    List<Funcion> ObtenerTodo();
+    List<FuncionDto> ObtenerTodo();
     Funcion? ObtenerPorId(int id);
     int AgregarFuncion(FuncionCreateDto funcion);
     bool ActualizarFuncion(int id, FuncionUpdateDto funcion); // <-- DTO en vez de modelo

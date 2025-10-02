@@ -15,31 +15,46 @@ namespace sve.Services
             _sectorRepository = sectorRepository;
         }
 
-        public List<Sector> ObtenerTodo() => _sectorRepository.GetAll();
+        public List<SectorDto> ObtenerTodo()
+        {
+            return _sectorRepository.GetAll()
+                .Select(sector => new SectorDto
+                {
+                    IdSector = sector.IdSector,
+                    Nombre = sector.Nombre,
+                    Capacidad = sector.Capacidad,
+                    IdLocal = sector.IdLocal,
+                    Local = sector.Local,      // relación con Local
+                    Tarifas = sector.Tarifas   // lista de tarifas asociadas
+                }).ToList();
+        }
 
-        public Sector? ObtenerPorId(int id) => _sectorRepository.GetById(id);
+        public Sector? ObtenerPorId(int id)
+        { 
+            return _sectorRepository.GetById(id); 
+        }
 
-        public int AgregarSector(SectorCreateDto dto)
+        public int AgregarSector(SectorCreateDto sector)
         {
             var nuevoSector = new Sector
             {
-                Nombre = dto.Nombre,
-                Capacidad = dto.Capacidad,
-                IdLocal = dto.IdLocal
+                Nombre = sector.Nombre,
+                Capacidad = sector.Capacidad,
+                IdLocal = sector.IdLocal
             };
             return _sectorRepository.Add(nuevoSector);
         }
 
-        public bool ActualizarSector(int id, SectorUpdateDto dto)
+        public bool ActualizarSector(int id, SectorUpdateDto sector)
         {
-            var sector = new Sector
+            var entidad = new Sector
             {
                 IdSector = id,
-                Nombre = dto.Nombre,
-                Capacidad = dto.Capacidad,
-                IdLocal = dto.IdLocal
+                Nombre = sector.Nombre,
+                Capacidad = sector.Capacidad,
+                IdLocal = sector.IdLocal
             };
-            return _sectorRepository.Update(id, sector);
+            return _sectorRepository.Update(id, entidad);
         }
 
         public bool EliminarSector(int id)

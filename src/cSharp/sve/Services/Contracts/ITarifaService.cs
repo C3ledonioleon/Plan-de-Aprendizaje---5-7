@@ -8,8 +8,8 @@ namespace sve.Services.Contracts
     {
         List<TarifaDto> ObtenerTodo();
         TarifaDto? ObtenerPorId(int id);
-        int AgregarTarifa(TarifaCreateDto dto);
-        bool ActualizarTarifa(int id, TarifaUpdateDto dto);
+        int AgregarTarifa(TarifaCreateDto tarifa);
+        bool ActualizarTarifa(int id, TarifaUpdateDto tarifa);
         bool EliminarTarifa(int id);
     }
 }

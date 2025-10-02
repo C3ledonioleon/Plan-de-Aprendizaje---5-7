@@ -20,64 +20,64 @@ namespace sve.Services
         public List<TarifaDto> ObtenerTodo()
         {
             return _tarifaRepository.GetAll()
-                .Select(t => new TarifaDto
+                .Select(tarifa => new TarifaDto
                 {
-                    IdTarifa = t.IdTarifa,
-                    IdFuncion = t.IdFuncion,
-                    IdSector = t.IdSector,
-                    Precio = t.Precio,
-                    Stock = t.Stock,
-                    Estado = t.Estado,
-                    Funcion = t.Funcion,
-                    Sector = t.Sector
+                    IdTarifa = tarifa.IdTarifa,
+                    IdFuncion = tarifa.IdFuncion,
+                    IdSector = tarifa.IdSector,
+                    Precio = tarifa.Precio,
+                    Stock = tarifa.Stock,
+                    Estado = tarifa.Estado,
+                    Funcion = tarifa.Funcion,
+                    Sector = tarifa.Sector
                 }).ToList();
         }
 
         // Devuelve una tarifa por ID
         public TarifaDto? ObtenerPorId(int id)
         {
-            var t = _tarifaRepository.GetById(id);
-            if (t == null) return null;
+            var tarifa = _tarifaRepository.GetById(id);
+            if (tarifa == null) return null;
 
             return new TarifaDto
             {
-                IdTarifa = t.IdTarifa,
-                IdFuncion = t.IdFuncion,
-                IdSector = t.IdSector,
-                Precio = t.Precio,
-                Stock = t.Stock,
-                Estado = t.Estado,
-                Funcion = t.Funcion,
-                Sector = t.Sector
+                IdTarifa = tarifa.IdTarifa,
+                IdFuncion = tarifa.IdFuncion,
+                IdSector = tarifa.IdSector,
+                Precio = tarifa.Precio,
+                Stock = tarifa.Stock,
+                Estado = tarifa.Estado,
+                Funcion = tarifa.Funcion,
+                Sector = tarifa.Sector
             };
         }
 
         // Crea una tarifa nueva
-        public int AgregarTarifa(TarifaCreateDto dto)
+        public int AgregarTarifa(TarifaCreateDto tarifa)
         {
-            var tarifa = new Tarifa
+            var nuevaTarifa = new Tarifa
             {
-                IdFuncion = dto.IdFuncion,
-                IdSector = dto.IdSector,
-                Precio = dto.Precio,
-                Stock = dto.Stock,
-                Estado = dto.Estado
+                IdFuncion = tarifa.IdFuncion,
+                IdSector = tarifa.IdSector,
+                Precio = tarifa.Precio,
+                Stock = tarifa.Stock,
+                Estado = tarifa.Estado
             };
 
-            return _tarifaRepository.Add(tarifa);
+            return _tarifaRepository.Add(nuevaTarifa);
         }
 
         // Actualiza una tarifa existente
-        public bool ActualizarTarifa(int id, TarifaUpdateDto dto)
+        public bool ActualizarTarifa(int id, TarifaUpdateDto tarifa)
         {
-            var tarifa = new Tarifa
+            var entidad = new Tarifa
             {
-                Precio = dto.Precio,
-                Stock = dto.Stock,
-                Estado = dto.Estado
+                Precio = tarifa.Precio,
+                Stock = tarifa.Stock,
+                Estado = tarifa.Estado
             };
 
-            return _tarifaRepository.Update(id, tarifa);
+            return _tarifaRepository.Update(id, entidad);
         }
 
         // Elimina una tarifa por ID

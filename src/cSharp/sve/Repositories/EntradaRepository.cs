@@ -52,7 +52,7 @@ namespace sve.Repositories
                 UPDATE Entrada 
                 SET Precio = @Precio,
                 IdOrden = @IdOrden,
-                IdTarifa = @IdTarifa
+                IdTarifa = @IdTarifa,
                 Estado = @Estado
                 WHERE IdEntrada = @IdEntrada";
             int rows = db.Execute(sql, new { entrada.Precio, entrada.IdOrden, entrada.IdTarifa, entrada.Estado , IdEntrada = id });

@@ -6,7 +6,7 @@ namespace sve.Services.Contracts;
 
     public interface IEventoService
     {
-        List<Evento> ObtenerTodo();
+        List<EventoDto> ObtenerTodo();
         Evento? ObtenerPorId(int id);
         int AgregarEvento(EventoCreateDto evento);
         bool ActualizarEvento(int id, EventoUpdateDto evento );

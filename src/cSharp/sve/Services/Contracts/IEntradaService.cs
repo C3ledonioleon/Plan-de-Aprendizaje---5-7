@@ -6,7 +6,7 @@ namespace sve.Services.Contracts;
 
     public interface IEntradaService
     {
-        List<Entrada> ObtenerTodo();
+        List<EntradaDto> ObtenerTodo();
         Entrada? ObtenerPorId(int id);
         int AgregarEntrada(EntradaCreateDto entrada);
         bool ActualizarEntrada (int id, EntradaUpdateDto entrada);

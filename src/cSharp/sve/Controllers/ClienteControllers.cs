@@ -6,7 +6,7 @@ using sve.DTOs;
 namespace sve.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
@@ -17,11 +17,10 @@ namespace sve.Controllers
         }
 
         [HttpPost]
-        public IActionResult CrearCliente([FromBody] ClienteCreateDto dto)
+        public IActionResult CrearCliente([FromBody] ClienteCreateDto cliente)
         {
-
-            var id = _clienteService.AgregarCliente(dto);
-            return CreatedAtAction(nameof(ObtenerClientePorId), new { clienteId = id }, dto);
+            var id = _clienteService.AgregarCliente(cliente);
+            return CreatedAtAction(nameof(ObtenerClientePorId), new { clienteId = id }, cliente);
         }
 
         [HttpGet]
@@ -42,19 +41,15 @@ namespace sve.Controllers
         }
 
         // PUT /clientes/{clienteId} — Actualiza datos
-         [HttpPut("{clienteId}")]
-          public IActionResult ActualizarCliente(int clienteId, [FromBody] ClienteUpdateDto dto)
-       {
-       // Llamamos al servicio para actualizar directamente
-        var actualizado = _clienteService.ActualizarCliente(clienteId, dto);
-      if (!actualizado)
-        {   
-        // Si el cliente no existe, respondemos con 404
-        return NotFound();
+        [HttpPut("{clienteId}")]
+        public IActionResult ActualizarCliente(int clienteId, [FromBody] ClienteUpdateDto cliente)
+        {
+            var actualizado = _clienteService.ActualizarCliente(clienteId, cliente);
+            if (!actualizado)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
-        // Si se actualizó correctamente, respondemos 204 No Content
-        return NoContent();
-        }
-
     }
 }

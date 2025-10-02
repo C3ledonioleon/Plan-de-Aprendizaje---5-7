@@ -1,5 +1,6 @@
 using sve.DTOs;
 using sve.Models;
+using sve.Repositories;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
 
@@ -14,33 +15,48 @@ namespace sve.Services
             _localRepository = localRepository;
         }
 
-        public List<Local> ObtenerTodo() => _localRepository.GetAll();
+        public List<LocalDto> ObtenerTodo()
+            {
+            return _localRepository.GetAll()
+                .Select(local => new LocalDto
+                {
+                    IdLocal = local.IdLocal,
+                    Nombre = local.Nombre,
+                    Direccion = local.Direccion,
+                    CapacidadTotal = local.CapacidadTotal
+                }).ToList();
+        }
 
-        public Local? ObtenerPorId(int id) => _localRepository.GetById(id);
-
-        public int AgregarLocal(LocalCreateDto dto)
+        public Local? ObtenerPorId(int id) 
+        {
+            return _localRepository.GetById(id);
+        }
+        public int AgregarLocal(LocalCreateDto local)
         {
             var nuevoLocal = new Local
             {
-                Nombre = dto.Nombre,
-                Direccion = dto.Direccion,
-                CapacidadTotal = dto.CapacidadTotal
+                Nombre = local.Nombre,
+                Direccion = local.Direccion,
+                CapacidadTotal = local.CapacidadTotal
             };
             return _localRepository.Add(nuevoLocal);
         }
 
-        public bool ActualizarLocal(int id, LocalUpdateDto dto)
+        public bool ActualizarLocal(int id, LocalUpdateDto local)
         {
-            var local = new Local
+            var entidad = new Local
             {
                 IdLocal = id,
-                Nombre = dto.Nombre,
-                Direccion = dto.Direccion,
-                CapacidadTotal = dto.CapacidadTotal
+                Nombre = local.Nombre,
+                Direccion = local.Direccion,
+                CapacidadTotal = local.CapacidadTotal
             };
-            return _localRepository.Update(id, local);
+            return _localRepository.Update(id, entidad);
         }
 
-        public bool EliminarLocal(int id) => _localRepository.Delete(id);
+        public bool EliminarLocal(int id) 
+        {    
+        return _localRepository.Delete(id);
+        }
     }
 }

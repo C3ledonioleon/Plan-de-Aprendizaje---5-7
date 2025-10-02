@@ -2,10 +2,11 @@ using sve.DTOs;
 using sve.Models;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
+
 namespace sve.Services
 {
     public class FuncionService : IFuncionService
-    {
+    {  
         private readonly IFuncionRepository _funcionRepository;
 
         public FuncionService(IFuncionRepository funcionRepository)
@@ -13,38 +14,45 @@ namespace sve.Services
             _funcionRepository = funcionRepository;
         }
 
-        public List<Funcion> ObtenerTodo()
+        public List<FuncionDto> ObtenerTodo()
         {
-            return _funcionRepository.GetAll();
+            return _funcionRepository.GetAll()
+                .Select(funcion => new FuncionDto
+                {
+                    IdFuncion = funcion.IdFuncion,
+                    IdEvento = funcion.IdEvento,
+                    IdLocal = funcion.IdLocal,
+                    FechaHora = funcion.FechaHora,
+                    Estado = funcion.Estado
+                }).ToList();
         }
-
         public Funcion? ObtenerPorId(int id)
         {
             return _funcionRepository.GetById(id);
         }
 
-        public int AgregarFuncion(FuncionCreateDto dto)
+        public int AgregarFuncion(FuncionCreateDto funcion)
         {
             var nuevaFuncion = new Funcion
             {
-                IdEvento = dto.IdEvento,
-                IdLocal = dto.IdLocal,
-                FechaHora = dto.FechaHora,
+                IdEvento = funcion.IdEvento,
+                IdLocal = funcion.IdLocal,
+                FechaHora = funcion.FechaHora,
                 Estado = EstadoFuncion.Pendiente // Valor inicial
             };
 
             return _funcionRepository.Add(nuevaFuncion);
         }
 
-        public bool ActualizarFuncion(int id, FuncionUpdateDto dto)
+        public bool ActualizarFuncion(int id, FuncionUpdateDto funcion)
         {
             var entidad = new Funcion
             {
                 IdFuncion = id,
-                IdEvento = dto.IdEvento,
-                IdLocal = dto.IdLocal,
-                FechaHora = dto.FechaHora,
-                Estado = dto.Estado
+                IdEvento = funcion.IdEvento,
+                IdLocal = funcion.IdLocal,
+                FechaHora = funcion.FechaHora,
+                Estado = funcion.Estado
             };
 
             return _funcionRepository.Update(id, entidad);
@@ -60,7 +68,7 @@ namespace sve.Services
             var funcion = _funcionRepository.GetById(id);
             if (funcion == null) return false;
 
-            var dto = new FuncionUpdateDto
+            var funcionCancelada = new FuncionUpdateDto
             {
                 IdEvento = funcion.IdEvento,
                 IdLocal = funcion.IdLocal,
@@ -68,7 +76,9 @@ namespace sve.Services
                 Estado = EstadoFuncion.Cancelada
             };
 
-            return ActualizarFuncion(id, dto);
+            return ActualizarFuncion(id, funcionCancelada);
         }
+
+        
     }
 }

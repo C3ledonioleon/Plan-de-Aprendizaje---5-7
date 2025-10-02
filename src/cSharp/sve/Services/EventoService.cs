@@ -14,10 +14,10 @@ namespace sve.Services
             _eventoRepository = eventoRepository;
         }
 
-        public List<Evento> ObtenerTodo()
+        public List<EventoDto> ObtenerTodo()
         {
-            var evento = _eventoRepository.GetAll();
-            return evento.Select(evento => new Evento
+            var eventos = _eventoRepository.GetAll();
+            return eventos.Select(evento => new EventoDto
             {
                 IdEvento = evento.IdEvento,
                 Nombre = evento.Nombre,

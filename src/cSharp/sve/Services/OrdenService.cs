@@ -15,9 +15,22 @@ namespace sve.Services
             _ordenRepository = ordenRepository;
         }
 
-        public List<Orden> ObtenerTodo()
+        public List<OrdenDto> ObtenerTodo()
+
         {
-            return _ordenRepository.GetAll();
+            return _ordenRepository.GetAll()
+                .Select(orden => new OrdenDto
+                {
+                    IdOrden = orden.IdOrden,
+                    IdTarifa = orden.IdTarifa,
+                    IdCliente = orden.IdCliente,
+                    Total = orden.Total,
+                    Fecha = orden.Fecha,
+                    Estado = orden.Estado,
+                    Cliente = orden.Cliente,   // suponiendo que la entidad incluye la navegación
+                    Tarifa = orden.Tarifa,     // idem
+                    Entradas = orden.Entradas  // idem
+                }).ToList();
         }
 
         public Orden? ObtenerPorId(int id)
@@ -25,33 +38,33 @@ namespace sve.Services
             return _ordenRepository.GetById(id);
         }
 
-        public int AgregarOrden(OrdenCreateDto dto)
+        public int AgregarOrden(OrdenCreateDto orden)
         {
             var nuevaOrden = new Orden
             {
-                IdCliente = dto.IdCliente,
-                IdTarifa = dto.IdTarifa,
-                Total = dto.Total,
-                Fecha = dto.Fecha,
+                IdCliente = orden.IdCliente,
+                IdTarifa = orden.IdTarifa,
+                Total = orden.Total,
+                Fecha = orden.Fecha,
                 Estado = EstadoOrden.Creada
             };
 
             return _ordenRepository.Add(nuevaOrden);
         }
 
-        public bool ActualizarOrden(int id, OrdenUpdateDto dto)
+        public bool ActualizarOrden(int id, OrdenUpdateDto orden)
         {
-            var orden = new Orden
+            var entidad = new Orden
             {
                 IdOrden = id,
-                IdCliente = dto.IdCliente,
-                IdTarifa = dto.IdTarifa,
-                Total = dto.Total,
-                Fecha = dto.Fecha,
-                Estado = dto.Estado
+                IdCliente = orden.IdCliente,
+                IdTarifa = orden.IdTarifa,
+                Total = orden.Total,
+                Fecha = orden.Fecha,
+                Estado = orden.Estado
             };
 
-            return _ordenRepository.Update(id, orden);
+            return _ordenRepository.Update(id, entidad);
         }
 
         public bool EliminarOrden(int id)

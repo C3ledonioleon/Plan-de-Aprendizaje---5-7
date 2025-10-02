@@ -6,10 +6,10 @@ namespace sve.Services.Contracts
 {
     public interface IOrdenService
     {
-        List<Orden> ObtenerTodo();
+        List<OrdenDto> ObtenerTodo();
         Orden? ObtenerPorId(int id);
-        int AgregarOrden(OrdenCreateDto dto);
-        bool ActualizarOrden(int id, OrdenUpdateDto dto);
+        int AgregarOrden(OrdenCreateDto orden);
+        bool ActualizarOrden(int id, OrdenUpdateDto orden);
         bool EliminarOrden(int id);
     }
 }

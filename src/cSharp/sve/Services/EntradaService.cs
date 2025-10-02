@@ -14,9 +14,17 @@ namespace sve.Services
             _entradaRepository = entradaRepository;
         }
 
-        public List<Entrada> ObtenerTodo()
+        public List<EntradaDto> ObtenerTodo()
         {
-            return _entradaRepository.GetAll();
+            return _entradaRepository.GetAll()
+                .Select(entrada => new EntradaDto
+                {
+                    IdEntrada = entrada.IdEntrada,
+                    Precio = entrada.Precio,
+                    IdOrden = entrada.IdOrden,
+                    IdTarifa = entrada.IdTarifa,
+                    Estado = entrada.Estado
+                }).ToList();
         }
 
         public Entrada? ObtenerPorId(int id)
@@ -31,7 +39,9 @@ namespace sve.Services
                 Precio = entrada.Precio,
                 IdOrden = entrada.IdOrden,
                 IdTarifa = entrada.IdTarifa,
-                Estado = EstadoEntrada.Activa
+                Estado = EstadoEntrada.Activa,
+                IdCliente = entrada.IdCliente,   // <-- Asignar valor
+                IdFuncion = entrada.IdFuncion
             };
             return _entradaRepository.Add( nuevaEntrada);
         }

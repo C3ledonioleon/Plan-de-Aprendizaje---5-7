@@ -19,10 +19,10 @@ namespace sve.Controllers
 
         // POST /ordenes — Crea una orden
         [HttpPost]
-        public IActionResult CrearOrden([FromBody] OrdenCreateDto dto)
+        public IActionResult CrearOrden([FromBody] OrdenCreateDto orden)
         {
-            var id = _ordenService.AgregarOrden(dto);
-            return CreatedAtAction(nameof(ObtenerOrden), new { ordenId = id }, dto);
+            var id = _ordenService.AgregarOrden(orden);
+            return CreatedAtAction(nameof(ObtenerOrden), new { ordenId = id }, orden);
         }
 
         // GET /ordenes — Lista todas las órdenes
@@ -44,20 +44,13 @@ namespace sve.Controllers
 
         // PUT /ordenes/{ordenId} — Actualiza una orden
         [HttpPut("{ordenId}")]
-        public IActionResult ActualizarOrden(int ordenId, [FromBody] OrdenUpdateDto dto)
+        public IActionResult ActualizarOrden(int ordenId, [FromBody] OrdenUpdateDto orden)
         {
-            var actualizado = _ordenService.ActualizarOrden(ordenId, dto);
+            var actualizado = _ordenService.ActualizarOrden(ordenId, orden);
             if (!actualizado) return NotFound();
-            return NoContent();
-        }
-
-        // DELETE /ordenes/{ordenId} — Elimina una orden
-        [HttpDelete("{ordenId}")]
-        public IActionResult EliminarOrden(int ordenId)
-        {
-            var eliminado = _ordenService.EliminarOrden(ordenId);
-            if (!eliminado) return NotFound();
             return NoContent();
         }
     }
 }
+
+        // DELETE /ordenes/{ordenId} — Elimina una orden

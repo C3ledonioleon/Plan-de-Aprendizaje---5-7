@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using sve.DTOs;
-using sve.Models;
 using sve.Services.Contracts;
-using System.Linq;
 
 namespace sve.Controllers
 {
@@ -19,10 +17,10 @@ namespace sve.Controllers
 
         // POST /sectores — Crea un sector
         [HttpPost]
-        public IActionResult CrearSector([FromBody] SectorCreateDto dto)
+        public IActionResult CrearSector([FromBody] SectorCreateDto sector)
         {
-            var id = _sectorService.AgregarSector(dto);
-            return CreatedAtAction(nameof(ObtenerSector), new { sectorId = id }, dto);
+            var id = _sectorService.AgregarSector(sector);
+            return CreatedAtAction(nameof(ObtenerSector), new { sectorId = id }, sector);
         }
 
         // GET /sectores — Lista todos los sectores
@@ -44,9 +42,9 @@ namespace sve.Controllers
 
         // PUT /sectores/{sectorId} — Actualiza un sector
         [HttpPut("{sectorId}")]
-        public IActionResult ActualizarSector(int sectorId, [FromBody] SectorUpdateDto dto)
+        public IActionResult ActualizarSector(int sectorId, [FromBody] SectorUpdateDto sector)
         {
-            var actualizado = _sectorService.ActualizarSector(sectorId, dto);
+            var actualizado = _sectorService.ActualizarSector(sectorId, sector);
             if (!actualizado) return NotFound();
             return NoContent();
         }

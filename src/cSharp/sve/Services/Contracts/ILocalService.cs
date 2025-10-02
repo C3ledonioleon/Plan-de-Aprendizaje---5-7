@@ -6,7 +6,7 @@ namespace sve.Services.Contracts;
 
     public interface ILocalService
     {
-        List<Local> ObtenerTodo();
+        List<LocalDto> ObtenerTodo();
         Local? ObtenerPorId(int id);
         int AgregarLocal(LocalCreateDto local);         // Usar DTO para creación
         bool ActualizarLocal(int id, LocalUpdateDto local);  // Usar DTO para actualización

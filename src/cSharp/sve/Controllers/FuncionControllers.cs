@@ -18,10 +18,10 @@ namespace sve.Controllers
 
         // POST /funciones — Crea una Función
         [HttpPost]
-        public IActionResult CrearFuncion([FromBody] FuncionCreateDto dto)
+        public IActionResult CrearFuncion([FromBody] FuncionCreateDto funcion)
         {
-            var id = _funcionService.AgregarFuncion(dto);
-            return CreatedAtAction(nameof(ObtenerFuncion), new { funcionId = id }, dto);
+            var id = _funcionService.AgregarFuncion(funcion);
+            return CreatedAtAction(nameof(ObtenerFuncion), new { funcionId = id }, funcion);
         }
 
         // GET /funciones — Lista funciones
@@ -43,9 +43,9 @@ namespace sve.Controllers
 
         // PUT /funciones/{funcionId} — Actualiza función
         [HttpPut("{funcionId}")]
-        public IActionResult ActualizarFuncion(int funcionId, [FromBody] FuncionUpdateDto dto)
+        public IActionResult ActualizarFuncion(int funcionId, [FromBody] FuncionUpdateDto funcion)
         {
-            var actualizado = _funcionService.ActualizarFuncion(funcionId, dto);
+            var actualizado = _funcionService.ActualizarFuncion(funcionId, funcion);
             if (!actualizado) return NotFound();
             return NoContent();
         }

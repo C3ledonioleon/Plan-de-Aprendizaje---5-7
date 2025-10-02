@@ -7,8 +7,9 @@ namespace sve.Models
         public int IdOrden { get; set; }
         public int IdTarifa { get; set; }
         public EstadoEntrada Estado { get; set; }
-        
-        public Entrada()
+        public int IdCliente { get; set; }    // <-- Agregar esta propiedad
+        public int IdFuncion { get; set; }  // <-- Agregar esta propiedad
+        public Entrada() 
         { }
     }
 

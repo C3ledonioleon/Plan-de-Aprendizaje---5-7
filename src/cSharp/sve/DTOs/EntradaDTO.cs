@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text.Json.Serialization;
-using sve.Models; 
+using sve.Models;
 
 namespace sve.DTOs;
 
@@ -12,6 +7,8 @@ public class EntradaCreateDto
     public decimal Precio { get; set; }
     public int IdOrden { get; set; }
     public int IdTarifa { get; set; }
+    public int IdCliente { get; set; }   // <-- Agregar
+    public int IdFuncion { get; set; }
 }
 
 public class EntradaUpdateDto : EntradaCreateDto

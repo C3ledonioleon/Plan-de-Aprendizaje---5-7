@@ -17,10 +17,10 @@ namespace sve.Controllers
         }
 
         [HttpPost]
-        public IActionResult CrearEvento([FromBody] EventoCreateDto dto)
+        public IActionResult CrearEvento([FromBody] EventoCreateDto evento)
         {
-            var id = _eventoService.AgregarEvento(dto);
-            return CreatedAtAction(nameof(ObtenerEvento), new { eventoId = id }, dto);
+            var id = _eventoService.AgregarEvento(evento);
+            return CreatedAtAction(nameof(ObtenerEvento), new { eventoId = id }, evento);
         }
 
         [HttpGet]
@@ -39,9 +39,9 @@ namespace sve.Controllers
         }
 
         [HttpPut("{eventoId}")]
-        public IActionResult ActualizarEvento(int eventoId, [FromBody] EventoUpdateDto dto)
+        public IActionResult ActualizarEvento(int eventoId, [FromBody] EventoUpdateDto evento)
         {
-            var actualizado = _eventoService.ActualizarEvento(eventoId, dto);
+            var actualizado = _eventoService.ActualizarEvento(eventoId, evento);
             if (!actualizado) return NotFound();
             return NoContent();
         }
@@ -63,9 +63,9 @@ namespace sve.Controllers
         }
 
         [HttpPost("{eventoId}/cancelar")]
-        public IActionResult CancelarEvento(int Id)
+        public IActionResult CancelarEvento(int eventoId)
         {
-            var cancelado = _eventoService.Cancelar( Id);
+            var cancelado = _eventoService.Cancelar(eventoId);
             if (!cancelado) return NotFound();
             return Ok(new { mensaje = "Evento cancelado correctamente" });
         }

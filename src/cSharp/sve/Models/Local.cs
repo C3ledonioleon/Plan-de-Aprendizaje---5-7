@@ -9,8 +9,8 @@ namespace sve.Models
         public string Nombre { get; set; }
         public string Direccion { get; set; }
         public int CapacidadTotal { get; set; }
-        public List<Sector> Sectores { get; set; } = new();
-        public List<Funcion> Funciones { get; set; } = new();
+        public List<Sector> Sectores { get; set; }
+        public List<Funcion> Funciones { get; set; }
         
         public Local()
         { }

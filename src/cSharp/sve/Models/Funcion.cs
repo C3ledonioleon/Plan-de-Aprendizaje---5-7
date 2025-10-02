@@ -9,11 +9,11 @@ namespace sve.Models
         public int IdLocal { get; set; }
         public DateTime FechaHora { get; set; }
         public EstadoFuncion Estado { get; set; }
-        public Evento? Evento { get; set; }
-        public Local? Local { get; set; }
+        public Evento Evento { get; set; }
+        public Local Local { get; set; }
+        public List<Tarifa> Tarifas { get; set; }
         
-        public Funcion()
-        { }
+
     }
     public enum EstadoFuncion
     {

@@ -86,6 +86,15 @@ namespace sve_api.Models
                 entity.HasKey(e => e.IdTarifa);
                 entity.Property(e => e.IdTarifa)
                    .ValueGeneratedOnAdd();
+
+                entity.HasOne<Funcion>()
+                        .WithMany(e => e.Tarifas)
+                        .HasForeignKey(e => e.IdFuncion);
+                entity.HasOne<Sector>()
+                        .WithMany(e => e.Tarifas)
+                        .HasForeignKey(e => e.IdSector);
+        
+
             });
 
             modelBuilder.Entity<Funcion>(entity =>
@@ -93,15 +102,22 @@ namespace sve_api.Models
                 entity.HasKey(e => e.IdFuncion);
                 entity.Property(e => e.IdFuncion)
                    .ValueGeneratedOnAdd();
+
                 entity.HasOne<Evento>()
                       .WithMany(e => e.Funciones)
                       .HasForeignKey(e => e.IdEvento);
+
+                entity.HasOne<Local>()
+                      .WithMany(e => e.Funciones)
+                      .HasForeignKey(e => e.IdLocal);
+
             });
             modelBuilder.Entity<Usuario>(entity =>
             {
                 entity.HasKey(e => e.IdUsuario);
                 entity.Property(e => e.IdUsuario)
                    .ValueGeneratedOnAdd();
+            
             });
 
            modelBuilder.Entity<Local>(entity =>

@@ -4,6 +4,7 @@ namespace sve.DTOs
 {
     public class ClienteCreateDto
     {
+
         public required string DNI { get; set; }
         public required string Nombre { get; set; }
         public required string Telefono { get; set; }
@@ -11,8 +12,8 @@ namespace sve.DTOs
 
     public class ClienteUpdateDto : ClienteCreateDto
     {
-        // si después querés permitir actualizar también las ordenes,
-        // podés agregar la lista acá, de momento lo dejamos igual
+        // si despuï¿½s querï¿½s permitir actualizar tambiï¿½n las ordenes,
+        // podï¿½s agregar la lista acï¿½, de momento lo dejamos igual
     }
 
     public class ClienteDto
@@ -22,7 +23,7 @@ namespace sve.DTOs
         public required string Nombre { get; set; }
         public required string Telefono { get; set; }
 
-        // Podrías devolver también ordenes si lo necesitás en respuestas
+        // Podrï¿½as devolver tambiï¿½n ordenes si lo necesitï¿½s en respuestas
         public List<Orden> Ordenes { get; set; }
     }
 }

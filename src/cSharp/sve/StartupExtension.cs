@@ -9,6 +9,8 @@ public static class StartupExtension
     {
         services.AddScoped<IClienteService, ClienteService>();
         services.AddScoped<IEntradaService, EntradaService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
+        
         return services;
     }
     
@@ -29,6 +31,8 @@ public static class StartupExtension
         services.AddTransient<ISectorRepository, SectorRepository>();
 
         services.AddTransient<ITarifaRepository, TarifaRepository>();
+
+        services.AddTransient<IUsuarioRepository, UsuarioRepository>();
         
 
         return services;

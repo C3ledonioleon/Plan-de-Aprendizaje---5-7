@@ -1,45 +1,53 @@
 namespace sve.DTOs
 {
-    // 🔹 DTO para registrar usuario
+    // Registro de usuario
     public class RegisterDto
     {
-        public string Apodo { get; set; }
-        public string Email { get; set; }
-        public string Contrasenia { get; set; }
+        public string Apodo { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Contrasenia { get; set; } = null!;
     }
 
-    // 🔹 DTO para login
+    // Login
     public class LoginDto
     {
-        public string Email { get; set; }
-        public string Contrasenia { get; set; }
+        public string Email { get; set; } = null!;
+        public string Contrasenia { get; set; } = null!;
     }
 
-    // 🔹 DTO para refresh token
+    // Respuesta de autenticación
+    public class AuthResponseDto
+    {
+        public string Token { get; set; } = null!;
+        public UsuarioDto Usuario { get; set; } = null!;
+    }
+
+    // Refresh token
     public class RefreshTokenDto
     {
-        public string Token { get; set; }
+        public string Token { get; set; } = null!;
     }
 
-    // 🔹 DTO para devolver info básica del usuario (perfil)
+    // Datos de usuario
     public class UsuarioDto
     {
         public int IdUsuario { get; set; }
-        public string Apodo { get; set; }
-        public string Email { get; set; }
-        public string Rol { get; set; }
+        public string Apodo { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Rol { get; set; } = null!;
     }
 
-    // 🔹 DTO para cambio/asignación de roles
+    // Roles
     public class UsuarioRolDto
     {
-        public string Rol { get; set; }
+        public string Rol { get; set; } = null!;
     }
 
-    // 🔹 DTO para devolver login exitoso
-    public class AuthResponseDto
+    // Actualización de usuario
+    public class UsuarioUpdateDto
     {
-        public string Token { get; set; }
-        public UsuarioDto Usuario { get; set; }
+        public string Apodo { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string? Contrasenia { get; set; } // Opcional cambiar contraseña
     }
 }

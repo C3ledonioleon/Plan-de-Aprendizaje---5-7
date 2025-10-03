@@ -1,62 +1,63 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using sve.DTOs;
-using sve.Services;
+using sve.Services.Contracts;
 
 namespace sve.Controllers
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
-        private readonly UsuarioService _usuarioService;
+        private readonly IUsuarioService _usuarioService;
 
-        public UsuarioController(UsuarioService usuarioService)
+        public UsuarioController(IUsuarioService usuarioService)
         {
             _usuarioService = usuarioService;
         }
 
         // 🔹 Registro de usuario
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterDto dto)
+        [HttpPost("auth/register")]
+        public IActionResult Register([FromBody] RegisterDto usuario)
         {
-            var usuario = _usuarioService.Register(dto);
-            return Ok(usuario);
+            var usuarioId = _usuarioService.AgregarUsuario(usuario);
+            return Ok(new { IdUsuario = usuarioId });
         }
 
         // 🔹 Login y devuelve token
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDto dto)
+        [HttpPost("auth/login")]
+        public IActionResult Login([FromBody] LoginDto usuario)
         {
-            var auth = _usuarioService.Login(dto);
+            var auth = _usuarioService.Login(usuario);
             return Ok(auth);
         }
 
         // 🔹 Refresh token
-        [HttpPost("refresh")]
-        public IActionResult Refresh([FromBody] RefreshTokenDto dto)
+        [HttpPost("auth/refresh")]
+        public IActionResult Refresh([FromBody] RefreshTokenDto usuario)
         {
-            var token = _usuarioService.RefreshToken(dto);
+            var token = _usuarioService.RefreshToken(usuario);
             return Ok(new { Token = token });
         }
 
         // 🔹 Logout
-        [HttpPost("logout")]
-        public IActionResult Logout([FromBody] RefreshTokenDto dto)
+        [HttpPost("auth/logout")]
+        public IActionResult Logout([FromBody] RefreshTokenDto usuario)
         {
-            _usuarioService.Logout(dto.Token);
+            _usuarioService.Logout(usuario.Token);
             return Ok();
         }
 
         // 🔹 Perfil del usuario autenticado
-        [HttpGet("me/{usuarioId}")]
+        [HttpGet("auth/me/{usuarioId}")]
         public IActionResult Me(int usuarioId)
         {
             var usuario = _usuarioService.GetProfile(usuarioId);
+            if (usuario == null) return NotFound();
             return Ok(usuario);
         }
 
         // 🔹 Lista de roles disponibles
-        [HttpGet("roles")]
+        [HttpGet("auth/roles")]
         public IActionResult Roles()
         {
             var roles = _usuarioService.GetRoles();
@@ -64,11 +65,46 @@ namespace sve.Controllers
         }
 
         // 🔹 Asignar/cambiar rol de un usuario
-        [HttpPost("{usuarioId}/roles")]
-        public IActionResult AsignarRol(int usuarioId, [FromBody] UsuarioRolDto dto)
+        [HttpPost("usuarios/{usuarioId}/roles")]
+        public IActionResult AsignarRol(int usuarioId, [FromBody] UsuarioRolDto usuario)
         {
-            var usuario = _usuarioService.AsignarRol(usuarioId, dto);
+            var resultado = _usuarioService.AsignarRol(usuarioId, usuario);
+            return Ok(resultado);
+        }
+
+        // 🔹 Obtener todos los usuarios
+        [HttpGet("usuarios")]
+        public IActionResult ObtenerTodo()
+        {
+            var usuarios = _usuarioService.ObtenerTodo();
+            return Ok(usuarios);
+        }
+
+        // 🔹 Obtener usuario por ID
+        [HttpGet("usuarios/{id}")]
+        public IActionResult ObtenerPorId(int id)
+        {
+            var usuario = _usuarioService.ObtenerPorId(id);
+            if (usuario == null) return NotFound();
             return Ok(usuario);
+        }
+
+        // 🔹 Actualizar usuario
+        [HttpPut("usuarios/{id}")]
+        public IActionResult ActualizarUsuario(int id, [FromBody] UsuarioUpdateDto usuario)
+        {
+            var result = _usuarioService.ActualizarUsuario(id, usuario);
+            if (!result) return NotFound();
+            return Ok();
+        }
+
+        // 🔹 Eliminar usuario
+        [HttpDelete("usuarios/{id}")]
+        public IActionResult EliminarUsuario(int id)
+        {
+            var result = _usuarioService.EliminarUsuario(id);
+            if (!result) return NotFound();
+            return Ok();
         }
     }
 }

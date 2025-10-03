@@ -7,8 +7,8 @@ namespace sve.DTOs
     // DTO para crear un Local
     public class LocalCreateDto
     {
-        public  required string Nombre { get; set; } 
-        public  required string Direccion { get; set; } 
+        public  string Nombre { get; set; } 
+        public  string Direccion { get; set; } 
         public int CapacidadTotal { get; set; }
     }
 

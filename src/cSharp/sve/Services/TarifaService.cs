@@ -2,8 +2,6 @@ using sve.DTOs;
 using sve.Models;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace sve.Services
 {

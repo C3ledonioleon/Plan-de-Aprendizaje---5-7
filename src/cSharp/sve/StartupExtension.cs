@@ -29,6 +29,7 @@ public static class StartupExtension
         services.AddTransient<ISectorRepository, SectorRepository>();
 
         services.AddTransient<ITarifaRepository, TarifaRepository>();
+        
 
         return services;
     }

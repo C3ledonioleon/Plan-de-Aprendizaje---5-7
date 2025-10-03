@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using sve.Services;
 using sve_api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddRepositories();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<QRService>();
 builder.Services.AddDbContext<SveContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("myBD"),

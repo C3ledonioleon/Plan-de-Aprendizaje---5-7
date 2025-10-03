@@ -59,4 +59,5 @@ namespace sve.Services;
         {
             return _clienteRepository.Delete(id);
         }
-    }
+
+}

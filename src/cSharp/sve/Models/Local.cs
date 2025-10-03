@@ -12,7 +12,6 @@ namespace sve.Models
         public List<Sector> Sectores { get; set; }
         public List<Funcion> Funciones { get; set; }
         
-        public Local()
-        { }
+
     }
 }

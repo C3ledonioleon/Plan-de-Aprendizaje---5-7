@@ -94,7 +94,7 @@ namespace sve.Controllers
         public IActionResult ActualizarUsuario(int id, [FromBody] UsuarioUpdateDto usuario)
         {
             var result = _usuarioService.ActualizarUsuario(id, usuario);
-            if (!result) return NotFound();
+            if (result == 0) return NotFound();
             return Ok();
         }
 
@@ -103,7 +103,7 @@ namespace sve.Controllers
         public IActionResult EliminarUsuario(int id)
         {
             var result = _usuarioService.EliminarUsuario(id);
-            if (!result) return NotFound();
+            if (result == 0) return NotFound();
             return Ok();
         }
     }

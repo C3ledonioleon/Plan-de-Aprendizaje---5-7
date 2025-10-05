@@ -42,7 +42,7 @@ namespace sve.Services
             return _localRepository.Add(nuevoLocal);
         }
 
-        public bool ActualizarLocal(int id, LocalUpdateDto local)
+        public int ActualizarLocal(int id, LocalUpdateDto local)
         {
             var entidad = new Local
             {
@@ -54,7 +54,7 @@ namespace sve.Services
             return _localRepository.Update(id, entidad);
         }
 
-        public bool EliminarLocal(int id) 
+        public int EliminarLocal(int id) 
         {    
         return _localRepository.Delete(id);
         }

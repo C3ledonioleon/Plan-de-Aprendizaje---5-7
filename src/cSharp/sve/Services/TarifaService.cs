@@ -66,7 +66,7 @@ namespace sve.Services
         }
 
         // Actualiza una tarifa existente
-        public bool ActualizarTarifa(int id, TarifaUpdateDto tarifa)
+        public int ActualizarTarifa(int id, TarifaUpdateDto tarifa)
         {
             var entidad = new Tarifa
             {
@@ -79,7 +79,7 @@ namespace sve.Services
         }
 
         // Elimina una tarifa por ID
-        public bool EliminarTarifa(int id)
+        public int EliminarTarifa(int id)
         {
             return _tarifaRepository.Delete(id);
         }

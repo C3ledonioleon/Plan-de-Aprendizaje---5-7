@@ -47,7 +47,7 @@ namespace sve.Controllers
         public IActionResult ActualizarEntrada(int entradaId, [FromBody] EntradaUpdateDto entrada)
         {
             var actualizado = _entradaService.ActualizarEntrada(entradaId, entrada);
-            if (!actualizado) return NotFound($"No se encontró la entrada con ID {entradaId}");
+            if (actualizado == 0) return NotFound($"No se encontró la entrada con ID {entradaId}");
 
             return NoContent();
         }
@@ -57,7 +57,7 @@ namespace sve.Controllers
         public IActionResult AnularEntrada(int entradaId)
         {
             var resultado = _entradaService.AnularEntrada(entradaId);
-            if (!resultado) return NotFound($"No se encontró la entrada con ID {entradaId}");
+            if (resultado == 0) return NotFound($"No se encontró la entrada con ID {entradaId}");
 
             return Ok($"La entrada con ID {entradaId} fue anulada correctamente.");
         }
@@ -67,7 +67,7 @@ namespace sve.Controllers
         public IActionResult EliminarEntrada(int entradaId)
         {
             var eliminado = _entradaService.EliminarEntrada(entradaId);
-            if (!eliminado) return NotFound($"No se encontró la entrada con ID {entradaId}");
+            if (eliminado == 0) return NotFound($"No se encontró la entrada con ID {entradaId}");
 
             return NoContent();
         }

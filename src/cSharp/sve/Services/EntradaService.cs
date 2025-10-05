@@ -45,10 +45,10 @@ namespace sve.Services
             };
             return _entradaRepository.Add( nuevaEntrada);
         }
-        public bool ActualizarEntrada(int id, EntradaUpdateDto entrada)
+        public int ActualizarEntrada(int id, EntradaUpdateDto entrada)
         {
              var existente = _entradaRepository.GetById(id);
-            if (existente == null) return false;
+            if (existente == null) return 0;
 
             existente.Precio = entrada.Precio;
             existente.IdOrden = entrada.IdOrden;
@@ -60,15 +60,15 @@ namespace sve.Services
 
 
                 // Anular entrada
-        public bool AnularEntrada(int id)
+        public int AnularEntrada(int id)
         {
             var entrada = _entradaRepository.GetById(id);
-            if (entrada == null) return false;
+            if (entrada == null) return 0 ;
 
             entrada.Estado = EstadoEntrada.Anulada;
             return _entradaRepository.Update(id, entrada);
         }
-        public bool EliminarEntrada(int id)
+        public int EliminarEntrada(int id)
         {
             return _entradaRepository.Delete(id);
         }

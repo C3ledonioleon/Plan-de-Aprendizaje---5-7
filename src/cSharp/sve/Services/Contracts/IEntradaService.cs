@@ -9,7 +9,7 @@ namespace sve.Services.Contracts;
         List<EntradaDto> ObtenerTodo();
         Entrada? ObtenerPorId(int id);
         int AgregarEntrada(EntradaCreateDto entrada);
-        bool ActualizarEntrada (int id, EntradaUpdateDto entrada);
-        bool AnularEntrada(int id);
-        bool EliminarEntrada(int id);
+        int ActualizarEntrada (int id, EntradaUpdateDto entrada);
+        int AnularEntrada(int id);
+        int EliminarEntrada(int id);
     }

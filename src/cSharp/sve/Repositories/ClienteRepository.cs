@@ -7,7 +7,7 @@ namespace sve.Repositories;
 
 public class ClienteRepository : BaseRepository<Cliente>, IClienteRepository
 {
-    public ClienteRepository(IDbConnection connection) : base(connection)
+    public ClienteRepository (IDbConnection connection) : base(connection)
     {
     }
 }

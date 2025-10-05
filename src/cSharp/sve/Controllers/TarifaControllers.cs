@@ -46,7 +46,7 @@ namespace sve.Controllers
         public IActionResult ActualizarTarifa(int tarifaId, [FromBody] TarifaUpdateDto tarifa)
         {
             var actualizado = _tarifaService.ActualizarTarifa(tarifaId, tarifa);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return NoContent();
         }
 
@@ -55,7 +55,7 @@ namespace sve.Controllers
         public IActionResult EliminarTarifa(int tarifaId)
         {
             var eliminado = _tarifaService.EliminarTarifa(tarifaId);
-            if (!eliminado) return NotFound();
+            if (eliminado == 0) return NotFound();
             return NoContent();
         }
     }

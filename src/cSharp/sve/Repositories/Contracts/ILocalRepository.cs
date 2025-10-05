@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Local> GetAll();
         Local? GetById(int id);
         int Add(Local local);
-        bool Update(int id, Local local);
-        bool Delete(int id);
+        int Update(int id, Local local);
+        int Delete(int id);
     }
 }

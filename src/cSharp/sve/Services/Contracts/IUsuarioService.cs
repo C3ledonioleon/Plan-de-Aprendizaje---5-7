@@ -8,15 +8,15 @@ namespace sve.Services.Contracts
     {
         List<UsuarioDto> ObtenerTodo();
         List<string> GetRoles();
+        UsuarioDto? ObtenerPorId(int id);
         int AgregarUsuario(RegisterDto usuario);
         AuthResponseDto Login(LoginDto usuario);
         string RefreshToken(RefreshTokenDto usuario);
         void Logout(string token);
-        UsuarioDto GetProfile(int Id);
-        UsuarioDto AsignarRol(int Id, UsuarioRolDto usuario);
-        UsuarioDto? ObtenerPorId(int id);
-        bool ActualizarUsuario(int id, UsuarioUpdateDto usuario);
-        bool EliminarUsuario(int id);
+        UsuarioDto GetProfile(int id);
+        UsuarioDto AsignarRol(int id, UsuarioRolDto usuario);
+        int ActualizarUsuario(int id, UsuarioUpdateDto usuario);
+        int EliminarUsuario(int id);
         
     }
 }

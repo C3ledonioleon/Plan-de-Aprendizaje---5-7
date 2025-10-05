@@ -45,7 +45,7 @@ namespace sve.Controllers
         public IActionResult ActualizarCliente(int clienteId, [FromBody] ClienteUpdateDto cliente)
         {
             var actualizado = _clienteService.ActualizarCliente(clienteId, cliente);
-            if (!actualizado)
+            if (actualizado == 0)
             {
                 return NotFound();
             }

@@ -1,5 +1,4 @@
 using Dapper;
-using sve.Models;
 using sve.Repositories.Contracts;
 using System.Data;
 
@@ -17,14 +16,13 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     public T GetById(int id)
     {
         var sql = $"SELECT * FROM {typeof(T).Name} WHERE Id{typeof(T).Name} = @Id";
-        var sql2 = $"SELECT * FROM Cliente WHERE IdCliente = @Id";
         return _connection.QuerySingleOrDefault<T>(sql, new { Id = id });
     }
 
-    public IEnumerable<T> GetAll()
+    public List<T> GetAll()
     {
         var sql = $"SELECT * FROM {typeof(T).Name}";
-        return _connection.Query<T>(sql);
+        return _connection.Query<T>(sql).ToList();
     }
 
     public int Add(T entity)
@@ -43,7 +41,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         return _connection.QuerySingle<int>(sql, entity);
     }
 
-    public int Update(T entity)
+    public int Update( int id,T entity)
     {
         var props = typeof(T).GetProperties()
             .Where(p => p.Name != typeof(T).Name);
@@ -59,4 +57,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         var sql = $"DELETE FROM {typeof(T).Name} WHERE {typeof(T).Name} = @Id";
         return _connection.Execute(sql, new { Id = id });
     }
+
+
 }

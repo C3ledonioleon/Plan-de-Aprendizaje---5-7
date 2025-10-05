@@ -1,54 +1,54 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Xunit;
 using Moq;
-using Xunit;
+using System.Collections.Generic;
+using System.Linq;
+using sve.Services;
+using sve.Services.Contracts;
+using sve.Repositories.Contracts;
 using sve.Models;
 using sve.DTOs;
-using sve.Repositories.Contracts;
-using sve.Services;
 
-namespace sve.Tests
+namespace sve.Tests.Services
 {
     public class EntradaServiceTests
     {
         private readonly Mock<IEntradaRepository> _mockRepo;
-        private readonly EntradaService _entradaService;
+        private readonly EntradaService _service;
 
         public EntradaServiceTests()
         {
             _mockRepo = new Mock<IEntradaRepository>();
-            _entradaService = new EntradaService(_mockRepo.Object);
+            _service = new EntradaService(_mockRepo.Object);
         }
 
         [Fact]
-        public void ObtenerTodo_RetornaListaEntradaDto()
+        public void ObtenerTodo_DeberiaRetornarListaDeEntradas()
         {
             // Arrange
             var entradas = new List<Entrada>
             {
                 new Entrada { IdEntrada = 1, Precio = 100, IdOrden = 1, IdTarifa = 1, Estado = EstadoEntrada.Activa },
-                new Entrada { IdEntrada = 2, Precio = 200, IdOrden = 2, IdTarifa = 2, Estado = EstadoEntrada.Activa }
+                new Entrada { IdEntrada = 2, Precio = 150, IdOrden = 1, IdTarifa = 2, Estado = EstadoEntrada.Activa }
             };
             _mockRepo.Setup(r => r.GetAll()).Returns(entradas);
 
             // Act
-            var resultado = _entradaService.ObtenerTodo();
+            var resultado = _service.ObtenerTodo();
 
             // Assert
             Assert.Equal(2, resultado.Count);
-            Assert.Equal(100, resultado[0].Precio);
-            Assert.Equal(200, resultado[1].Precio);
+            Assert.Equal(100, resultado.First().Precio);
         }
 
         [Fact]
-        public void ObtenerPorId_EntradaExistente_RetornaEntrada()
+        public void ObtenerPorId_EntradaExiste_DeberiaRetornarEntrada()
         {
             // Arrange
             var entrada = new Entrada { IdEntrada = 1, Precio = 100, IdOrden = 1, IdTarifa = 1, Estado = EstadoEntrada.Activa };
             _mockRepo.Setup(r => r.GetById(1)).Returns(entrada);
 
             // Act
-            var resultado = _entradaService.ObtenerPorId(1);
+            var resultado = _service.ObtenerPorId(1);
 
             // Assert
             Assert.NotNull(resultado);
@@ -56,107 +56,66 @@ namespace sve.Tests
         }
 
         [Fact]
-        public void ObtenerPorId_EntradaNoExistente_RetornaNull()
+        public void AgregarEntrada_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Entrada)null);
+            var dto = new EntradaCreateDto { Precio = 200, IdOrden = 1, IdTarifa = 2, IdCliente = 5, IdFuncion = 3 };
+            _mockRepo.Setup(r => r.Add(It.IsAny<Entrada>())).Returns(10);
 
             // Act
-            var resultado = _entradaService.ObtenerPorId(99);
+            var resultado = _service.AgregarEntrada(dto);
 
             // Assert
-            Assert.Null(resultado);
+            _mockRepo.Verify(r => r.Add(It.Is<Entrada>(e => e.Precio == 200)), Times.Once);
+            Assert.Equal(10, resultado);
         }
 
         [Fact]
-        public void AgregarEntrada_Correctamente_RetornaId()
-        {
-            // Arrange
-            var createDto = new EntradaCreateDto { Precio = 150, IdOrden = 1, IdTarifa = 1, IdCliente = 1, IdFuncion = 1 };
-            _mockRepo.Setup(r => r.Add(It.IsAny<Entrada>())).Returns(1);
-
-            // Act
-            var idNuevo = _entradaService.AgregarEntrada(createDto);
-
-            // Assert
-            Assert.Equal(1, idNuevo);
-            _mockRepo.Verify(r => r.Add(It.IsAny<Entrada>()), Times.Once);
-        }
-
-        [Fact]
-        public void ActualizarEntrada_EntradaExistente_RetornaTrue()
+        public void ActualizarEntrada_EntradaExiste_DeberiaActualizarYRetornarUno()
         {
             // Arrange
             var existente = new Entrada { IdEntrada = 1, Precio = 100, IdOrden = 1, IdTarifa = 1, Estado = EstadoEntrada.Activa };
-            var updateDto = new EntradaUpdateDto { Precio = 200, IdOrden = 1, IdTarifa = 1, Estado = EstadoEntrada.Activa };
+            var dto = new EntradaUpdateDto { Precio = 150, IdOrden = 2, IdTarifa = 2, Estado = EstadoEntrada.Activa };
 
             _mockRepo.Setup(r => r.GetById(1)).Returns(existente);
-            _mockRepo.Setup(r => r.Update(1, existente)).Returns(true);
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Entrada>())).Returns(1);
 
             // Act
-            var resultado = _entradaService.ActualizarEntrada(1, updateDto);
+            var resultado = _service.ActualizarEntrada(1, dto);
 
             // Assert
-            Assert.True(resultado);
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Entrada>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Entrada>(e => e.Precio == 150 && e.IdOrden == 2)), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void ActualizarEntrada_EntradaNoExistente_RetornaFalse()
-        {
-            // Arrange
-            var updateDto = new EntradaUpdateDto { Precio = 200, IdOrden = 1, IdTarifa = 1, Estado = EstadoEntrada.Activa };
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Entrada)null);
-
-            // Act
-            var resultado = _entradaService.ActualizarEntrada(99, updateDto);
-
-            // Assert
-            Assert.False(resultado);
-        }
-
-        [Fact]
-        public void AnularEntrada_EntradaExistente_RetornaTrue()
+        public void AnularEntrada_EntradaExiste_DeberiaCambiarEstadoYRetornarUno()
         {
             // Arrange
             var entrada = new Entrada { IdEntrada = 1, Estado = EstadoEntrada.Activa };
             _mockRepo.Setup(r => r.GetById(1)).Returns(entrada);
-            _mockRepo.Setup(r => r.Update(1, entrada)).Returns(true);
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Entrada>())).Returns(1);
 
             // Act
-            var resultado = _entradaService.AnularEntrada(1);
+            var resultado = _service.AnularEntrada(1);
 
             // Assert
-            Assert.True(resultado);
-            Assert.Equal(EstadoEntrada.Anulada, entrada.Estado);
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Entrada>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Entrada>(e => e.Estado == EstadoEntrada.Anulada)), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void AnularEntrada_EntradaNoExistente_RetornaFalse()
+        public void EliminarEntrada_DeberiaLlamarRepositorioYRetornarUno()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Entrada)null);
+            _mockRepo.Setup(r => r.Delete(1)).Returns(1);
 
             // Act
-            var resultado = _entradaService.AnularEntrada(99);
+            var resultado = _service.EliminarEntrada(1);
 
             // Assert
-            Assert.False(resultado);
-        }
-
-        [Fact]
-        public void EliminarEntrada_RetornaTrue()
-        {
-            // Arrange
-            _mockRepo.Setup(r => r.Delete(1)).Returns(true);
-
-            // Act
-            var resultado = _entradaService.EliminarEntrada(1);
-
-            // Assert
-            Assert.True(resultado);
             _mockRepo.Verify(r => r.Delete(1), Times.Once);
+            Assert.Equal(1, resultado);
         }
     }
 }

@@ -9,7 +9,7 @@ public interface IFuncionService
     List<FuncionDto> ObtenerTodo();
     Funcion? ObtenerPorId(int id);
     int AgregarFuncion(FuncionCreateDto funcion);
-    bool ActualizarFuncion(int id, FuncionUpdateDto funcion); // <-- DTO en vez de modelo
-    bool EliminarFuncion(int id);
-    bool CancelarFuncion(int id); // opcional para simplificar el controller
+    int ActualizarFuncion(int id, FuncionUpdateDto funcion); // <-- DTO en vez de modelo
+    int EliminarFuncion(int id);
+    int CancelarFuncion(int id); // opcional para simplificar el controller
 }

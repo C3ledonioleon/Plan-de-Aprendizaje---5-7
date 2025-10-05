@@ -45,7 +45,7 @@ namespace sve.Controllers
         public IActionResult ActualizarSector(int sectorId, [FromBody] SectorUpdateDto sector)
         {
             var actualizado = _sectorService.ActualizarSector(sectorId, sector);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0 ) return NotFound();
             return NoContent();
         }
 
@@ -54,7 +54,7 @@ namespace sve.Controllers
         public IActionResult EliminarSector(int sectorId)
         {
             var eliminado = _sectorService.EliminarSector(sectorId);
-            if (!eliminado) return NotFound();
+            if ( eliminado == 0) return NotFound();
             return NoContent();
         }
     }

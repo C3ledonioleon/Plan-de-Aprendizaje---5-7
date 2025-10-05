@@ -47,7 +47,7 @@ namespace sve.Controllers
         public IActionResult ActualizarOrden(int ordenId, [FromBody] OrdenUpdateDto orden)
         {
             var actualizado = _ordenService.ActualizarOrden(ordenId, orden);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return NoContent();
         }
     }

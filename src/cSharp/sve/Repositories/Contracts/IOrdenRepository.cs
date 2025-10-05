@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Orden> GetAll();
         Orden? GetById(int id);
         int Add(Orden orden);
-        bool Update(int id, Orden orden);
-        bool Delete (int id);
+        int Update(int id, Orden orden);
+        int Delete (int id);
     }
 }

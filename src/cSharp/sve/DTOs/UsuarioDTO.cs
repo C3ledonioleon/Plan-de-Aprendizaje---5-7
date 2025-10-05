@@ -32,22 +32,22 @@ namespace sve.DTOs
     public class UsuarioDto
     {
         public int IdUsuario { get; set; }
-        public string Apodo { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Rol { get; set; } = null!;
+        public string Apodo { get; set; } 
+        public string Email { get; set; }
+        public string Rol { get; set; } 
     }
 
     // Roles
     public class UsuarioRolDto
     {
-        public string Rol { get; set; } = null!;
+        public string Rol { get; set; } 
     }
 
     // Actualización de usuario
     public class UsuarioUpdateDto
     {
-        public string Apodo { get; set; } = null!;
-        public string Email { get; set; } = null!;
+        public string Apodo { get; set; }
+        public string Email { get; set; } 
         public string? Contrasenia { get; set; } // Opcional cambiar contraseña
     }
 }

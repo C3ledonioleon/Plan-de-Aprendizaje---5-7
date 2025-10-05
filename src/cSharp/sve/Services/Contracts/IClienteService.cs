@@ -9,6 +9,6 @@ namespace sve.Services.Contracts;
         List<ClienteDto> ObtenerTodo();            // Antes: GetAll
         Cliente? ObtenerPorId(int id);           // Antes: GetById
         int AgregarCliente(ClienteCreateDto cliente);     // Antes: Add
-        bool ActualizarCliente(int id, ClienteUpdateDto cliente); // Antes: Update
-        bool EliminarCliente(int id);            // Antes: Delete
+        int ActualizarCliente(int id, ClienteUpdateDto cliente); // Antes: Update
+        int EliminarCliente(int id);            // Antes: Delete
     }

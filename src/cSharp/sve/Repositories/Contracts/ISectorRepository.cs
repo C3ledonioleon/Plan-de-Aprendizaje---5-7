@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Sector> GetAll();
         Sector? GetById(int id);
         int Add(Sector sector);
-        bool Update(int id, Sector sector);
-        bool Delete(int sectorId);
+        int Update(int id, Sector sector);
+        int Delete(int sectorId);
     }
 }

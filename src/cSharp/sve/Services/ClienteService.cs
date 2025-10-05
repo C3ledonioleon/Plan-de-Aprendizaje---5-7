@@ -44,10 +44,10 @@ namespace sve.Services;
         }
 
       // Actualizar cliente
-        public bool ActualizarCliente(int id, ClienteUpdateDto cliente )
+        public int ActualizarCliente(int id, ClienteUpdateDto cliente )
         {
             var clienteExistente = _clienteRepository.GetById(id);
-            if (clienteExistente == null) return false;
+            if (clienteExistente == null) return 0 ;
 
             clienteExistente.DNI = cliente.DNI;
             clienteExistente.Nombre = cliente.Nombre;
@@ -55,7 +55,7 @@ namespace sve.Services;
 
             return _clienteRepository.Update(id, clienteExistente);
         }
-        public bool EliminarCliente(int id)
+        public int EliminarCliente(int id)
         {
             return _clienteRepository.Delete(id);
         }

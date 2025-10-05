@@ -46,7 +46,7 @@ namespace sve.Controllers
         public IActionResult ActualizarFuncion(int funcionId, [FromBody] FuncionUpdateDto funcion)
         {
             var actualizado = _funcionService.ActualizarFuncion(funcionId, funcion);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return NoContent();
         }
 
@@ -55,7 +55,7 @@ namespace sve.Controllers
         public IActionResult EliminarFuncion(int funcionId)
         {
             var eliminado = _funcionService.EliminarFuncion(funcionId);
-            if (!eliminado) return NotFound();
+            if (eliminado == 0) return NotFound();
             return NoContent();
         }
 
@@ -64,7 +64,7 @@ namespace sve.Controllers
         public IActionResult CancelarFuncion(int funcionId)
         {
             var actualizado = _funcionService.CancelarFuncion(funcionId);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return Ok(new { mensaje = "Función cancelada correctamente" });
         }
     }

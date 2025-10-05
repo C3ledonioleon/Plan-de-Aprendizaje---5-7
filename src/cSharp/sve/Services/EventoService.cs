@@ -55,7 +55,7 @@ namespace sve.Services
             };
             return _eventoRepository.Add(nuevoEvento);
         }
-            public bool ActualizarEvento(int id, EventoUpdateDto evento)
+            public int ActualizarEvento(int id, EventoUpdateDto evento)
             {
             var entidadEvento = new Evento
             {
@@ -69,24 +69,24 @@ namespace sve.Services
     return _eventoRepository.Update(id, entidadEvento);
 }
 
-        public bool EliminarEvento(int id)
+        public int EliminarEvento(int id)
         {
             return _eventoRepository.Delete(id);
         }
 
-        public bool Publicar(int id)
+        public int Publicar(int id)
         {
             var evento = _eventoRepository.GetById(id);
-            if (evento == null) return false;
+            if (evento == null) return 0;
 
             evento.Estado = EstadoEvento.Publicado;
             return _eventoRepository.Update(id, evento);
         }
 
-        public bool Cancelar(int id)
+        public int Cancelar(int id)
         {
             var evento = _eventoRepository.GetById(id);
-            if (evento == null) return false;
+            if (evento == null) return 0;
 
             evento.Estado = EstadoEvento.Cancelado;
             return _eventoRepository.Update(id, evento);

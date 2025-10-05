@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Evento> GetAll();
         Evento? GetById(int id);
         int Add(Evento evento);
-        bool Update(int id, Evento evento);
-        bool Delete(int id);
+        int Update(int id, Evento evento);
+        int Delete(int id);
     }
 }

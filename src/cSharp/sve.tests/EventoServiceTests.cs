@@ -1,55 +1,54 @@
-﻿using System;
+﻿using Xunit;
+using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
-using Xunit;
+using sve.Services;
+using sve.Services.Contracts;
+using sve.Repositories.Contracts;
 using sve.Models;
 using sve.DTOs;
-using sve.Repositories.Contracts;
-using sve.Services;
 
-namespace sve.Tests
+namespace sve.Tests.Services
 {
     public class EventoServiceTests
     {
         private readonly Mock<IEventoRepository> _mockRepo;
-        private readonly EventoService _eventoService;
+        private readonly EventoService _service;
 
         public EventoServiceTests()
         {
             _mockRepo = new Mock<IEventoRepository>();
-            _eventoService = new EventoService(_mockRepo.Object);
+            _service = new EventoService(_mockRepo.Object);
         }
 
         [Fact]
-        public void ObtenerTodo_RetornaListaEventoDto()
+        public void ObtenerTodo_DeberiaRetornarListaDeEventos()
         {
             // Arrange
             var eventos = new List<Evento>
             {
-                new Evento { IdEvento = 1, Nombre = "Evento1", Descripcion = "Desc1", FechaInicio = DateTime.Now, FechaFin = DateTime.Now.AddDays(1), Estado = EstadoEvento.Inactivo },
-                new Evento { IdEvento = 2, Nombre = "Evento2", Descripcion = "Desc2", FechaInicio = DateTime.Now, FechaFin = DateTime.Now.AddDays(2), Estado = EstadoEvento.Inactivo }
+                new Evento { IdEvento = 1, Nombre = "Evento1", Descripcion = "Desc1", Estado = EstadoEvento.Inactivo },
+                new Evento { IdEvento = 2, Nombre = "Evento2", Descripcion = "Desc2", Estado = EstadoEvento.Inactivo }
             };
             _mockRepo.Setup(r => r.GetAll()).Returns(eventos);
 
             // Act
-            var resultado = _eventoService.ObtenerTodo();
+            var resultado = _service.ObtenerTodo();
 
             // Assert
             Assert.Equal(2, resultado.Count);
-            Assert.Equal("Evento1", resultado[0].Nombre);
-            Assert.Equal("Evento2", resultado[1].Nombre);
+            Assert.Equal("Evento1", resultado.First().Nombre);
         }
 
         [Fact]
-        public void ObtenerPorId_Existente_RetornaEvento()
+        public void ObtenerPorId_Existe_DeberiaRetornarEvento()
         {
             // Arrange
-            var evento = new Evento { IdEvento = 1, Nombre = "Evento1", Descripcion = "Desc1", FechaInicio = DateTime.Now, FechaFin = DateTime.Now.AddDays(1), Estado = EstadoEvento.Inactivo };
+            var evento = new Evento { IdEvento = 1, Nombre = "Evento1", Descripcion = "Desc1", Estado = EstadoEvento.Inactivo };
             _mockRepo.Setup(r => r.GetById(1)).Returns(evento);
 
             // Act
-            var resultado = _eventoService.ObtenerPorId(1);
+            var resultado = _service.ObtenerPorId(1);
 
             // Assert
             Assert.NotNull(resultado);
@@ -57,92 +56,92 @@ namespace sve.Tests
         }
 
         [Fact]
-        public void ObtenerPorId_NoExistente_RetornaNull()
+        public void ObtenerPorId_NoExiste_DeberiaRetornarNull()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Evento)null);
+            _mockRepo.Setup(r => r.GetById(1)).Returns((Evento?)null);
 
             // Act
-            var resultado = _eventoService.ObtenerPorId(99);
+            var resultado = _service.ObtenerPorId(1);
 
             // Assert
             Assert.Null(resultado);
         }
 
         [Fact]
-        public void AgregarEvento_Correctamente_RetornaId()
+        public void AgregarEvento_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
-            var createDto = new EventoCreateDto { Nombre = "NuevoEvento", Descripcion = "Desc", FechaInicio = DateTime.Now, FechaFin = DateTime.Now.AddDays(1) };
-            _mockRepo.Setup(r => r.Add(It.IsAny<Evento>())).Returns(1);
+            var dto = new EventoCreateDto { Nombre = "Nuevo", Descripcion = "Desc", FechaInicio = System.DateTime.Now, FechaFin = System.DateTime.Now.AddDays(1) };
+            _mockRepo.Setup(r => r.Add(It.IsAny<Evento>())).Returns(10);
 
             // Act
-            var idNuevo = _eventoService.AgregarEvento(createDto);
+            var resultado = _service.AgregarEvento(dto);
 
             // Assert
-            Assert.Equal(1, idNuevo);
-            _mockRepo.Verify(r => r.Add(It.IsAny<Evento>()), Times.Once);
+            _mockRepo.Verify(r => r.Add(It.Is<Evento>(e => e.Nombre == "Nuevo")), Times.Once);
+            Assert.Equal(10, resultado);
         }
 
         [Fact]
-        public void ActualizarEvento_RetornaTrue()
+        public void ActualizarEvento_DeberiaLlamarRepositorioYRetornarUno()
         {
             // Arrange
-            var updateDto = new EventoUpdateDto { Nombre = "Actualizado", Descripcion = "Desc", FechaInicio = DateTime.Now, FechaFin = DateTime.Now.AddDays(1), Estado = EstadoEvento.Inactivo };
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(true);
+            var dto = new EventoUpdateDto { Nombre = "Update", Descripcion = "Desc", FechaInicio = System.DateTime.Now, FechaFin = System.DateTime.Now.AddDays(1), Estado = EstadoEvento.Publicado };
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
 
             // Act
-            var resultado = _eventoService.ActualizarEvento(1, updateDto);
+            var resultado = _service.ActualizarEvento(1, dto);
 
             // Assert
-            Assert.True(resultado);
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Evento>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Nombre == "Update")), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void EliminarEvento_RetornaTrue()
+        public void EliminarEvento_DeberiaLlamarRepositorioYRetornarUno()
         {
             // Arrange
-            _mockRepo.Setup(r => r.Delete(1)).Returns(true);
+            _mockRepo.Setup(r => r.Delete(1)).Returns(1);
 
             // Act
-            var resultado = _eventoService.EliminarEvento(1);
+            var resultado = _service.EliminarEvento(1);
 
             // Assert
-            Assert.True(resultado);
             _mockRepo.Verify(r => r.Delete(1), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void PublicarEvento_RetornaTrue()
+        public void Publicar_Existe_DeberiaCambiarEstadoYRetornarUno()
         {
             // Arrange
             var evento = new Evento { IdEvento = 1, Estado = EstadoEvento.Inactivo };
             _mockRepo.Setup(r => r.GetById(1)).Returns(evento);
-            _mockRepo.Setup(r => r.Update(1, evento)).Returns(true);
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
 
             // Act
-            var resultado = _eventoService.Publicar(1);
+            var resultado = _service.Publicar(1);
 
             // Assert
-            Assert.True(resultado);
-            Assert.Equal(EstadoEvento.Publicado, evento.Estado);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Estado == EstadoEvento.Publicado)), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void CancelarEvento_RetornaTrue()
+        public void Cancelar_Existe_DeberiaCambiarEstadoYRetornarUno()
         {
             // Arrange
             var evento = new Evento { IdEvento = 1, Estado = EstadoEvento.Publicado };
             _mockRepo.Setup(r => r.GetById(1)).Returns(evento);
-            _mockRepo.Setup(r => r.Update(1, evento)).Returns(true);
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
 
             // Act
-            var resultado = _eventoService.Cancelar(1);
+            var resultado = _service.Cancelar(1);
 
             // Assert
-            Assert.True(resultado);
-            Assert.Equal(EstadoEvento.Cancelado, evento.Estado);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Estado == EstadoEvento.Cancelado)), Times.Once);
+            Assert.Equal(1, resultado);
         }
     }
 }

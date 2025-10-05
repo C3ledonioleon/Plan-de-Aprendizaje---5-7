@@ -9,7 +9,7 @@ namespace sve.Repositories.Contracts
         Usuario? GetById(int id);
         Usuario? GetByEmail(string email);
         int Add(Usuario usuario);
-        bool Update(Usuario usuario);
-        bool Delete(int id);
+        int Update(int id, Usuario usuario);
+        int Delete(int id);
     }
 }

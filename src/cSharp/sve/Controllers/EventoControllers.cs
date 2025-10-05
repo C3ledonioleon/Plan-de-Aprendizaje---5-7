@@ -42,7 +42,7 @@ namespace sve.Controllers
         public IActionResult ActualizarEvento(int eventoId, [FromBody] EventoUpdateDto evento)
         {
             var actualizado = _eventoService.ActualizarEvento(eventoId, evento);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return NoContent();
         }
 
@@ -50,7 +50,7 @@ namespace sve.Controllers
         public IActionResult EliminarEvento(int eventoId)
         {
             var eliminado = _eventoService.EliminarEvento(eventoId);
-            if (!eliminado) return NotFound();
+            if (eliminado == 0) return NotFound();
             return NoContent();
         }
 
@@ -58,7 +58,7 @@ namespace sve.Controllers
         public IActionResult PublicarEvento(int eventoId)
         {
             var publicado = _eventoService.Publicar(eventoId);
-            if (!publicado) return NotFound();
+            if (publicado == 0) return NotFound();
             return Ok(new { mensaje = "Evento publicado correctamente" });
         }
 
@@ -66,7 +66,7 @@ namespace sve.Controllers
         public IActionResult CancelarEvento(int eventoId)
         {
             var cancelado = _eventoService.Cancelar(eventoId);
-            if (!cancelado) return NotFound();
+            if (cancelado == 0) return NotFound();
             return Ok(new { mensaje = "Evento cancelado correctamente" });
         }
     }

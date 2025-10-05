@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Entrada> GetAll();
         Entrada? GetById(int id);
         int Add(Entrada entrada); 
-        bool Update(int id, Entrada entrada);
-        bool Delete(int id);
+        int Update(int id, Entrada entrada);
+        int Delete(int id);
     }
 }

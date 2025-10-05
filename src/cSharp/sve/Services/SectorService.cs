@@ -45,7 +45,7 @@ namespace sve.Services
             return _sectorRepository.Add(nuevoSector);
         }
 
-        public bool ActualizarSector(int id, SectorUpdateDto sector)
+        public int ActualizarSector(int id, SectorUpdateDto sector)
         {
             var entidad = new Sector
             {
@@ -57,7 +57,7 @@ namespace sve.Services
             return _sectorRepository.Update(id, entidad);
         }
 
-        public bool EliminarSector(int id)
+        public int EliminarSector(int id)
         {
             return _sectorRepository.Delete(id);
         }

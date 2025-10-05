@@ -38,7 +38,7 @@ namespace sve.Controllers
         public IActionResult ActualizarLocal(int idLocal, [FromBody] LocalUpdateDto local)
         {
             var actualizado = _localService.ActualizarLocal(idLocal, local);
-            if (!actualizado) return NotFound();
+            if (actualizado == 0) return NotFound();
             return NoContent();
         }
 
@@ -46,7 +46,7 @@ namespace sve.Controllers
         public IActionResult EliminarLocal(int idLocal)
         {
             var eliminado = _localService.EliminarLocal(idLocal);
-            if (!eliminado) return NotFound();
+            if (eliminado == 0) return NotFound();
             return NoContent();
         }
     }

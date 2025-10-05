@@ -44,7 +44,7 @@ namespace sve.Services
             return _funcionRepository.Add(nuevaFuncion);
         }
 
-        public bool ActualizarFuncion(int id, FuncionUpdateDto funcion)
+        public int ActualizarFuncion(int id, FuncionUpdateDto funcion)
         {
             var entidad = new Funcion
             {
@@ -58,15 +58,15 @@ namespace sve.Services
             return _funcionRepository.Update(id, entidad);
         }
 
-        public bool EliminarFuncion(int id)
+        public int EliminarFuncion(int id)
         {
             return _funcionRepository.Delete(id);
         }
 
-        public bool CancelarFuncion(int id)
+        public int CancelarFuncion(int id)
         {
             var funcion = _funcionRepository.GetById(id);
-            if (funcion == null) return false;
+            if (funcion == null) return 0;
 
             var funcionCancelada = new FuncionUpdateDto
             {

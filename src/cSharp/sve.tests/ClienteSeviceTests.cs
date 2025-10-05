@@ -1,53 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using Xunit;
 using Moq;
-using Xunit;
+using System.Collections.Generic;
+using System.Linq;
+using sve.Services;
+using sve.Services.Contracts;
+using sve.Repositories.Contracts;
 using sve.Models;
 using sve.DTOs;
-using sve.Repositories.Contracts;
-using sve.Services;
 
 namespace sve.Tests
 {
     public class ClienteServiceTests
     {
         private readonly Mock<IClienteRepository> _mockRepo;
-        private readonly ClienteService _clienteService;
+        private readonly ClienteService _service;
 
         public ClienteServiceTests()
         {
             _mockRepo = new Mock<IClienteRepository>();
-            _clienteService = new ClienteService(_mockRepo.Object);
+            _service = new ClienteService(_mockRepo.Object);
         }
 
         [Fact]
-        public void ObtenerTodo_RetornaListaClientesDto()
+        public void ObtenerTodo_DeberiaRetornarListaDeClientes()
         {
             // Arrange
             var clientes = new List<Cliente>
             {
-                new Cliente { IdCliente = 1, DNI = "123", Nombre = "Juan", Telefono = "111" },
-                new Cliente { IdCliente = 2, DNI = "456", Nombre = "Ana", Telefono = "222" }
+                new Cliente { IdCliente = 1, DNI = "123", Nombre = "Juan", Telefono = "1111" },
+                new Cliente { IdCliente = 2, DNI = "456", Nombre = "Maria", Telefono = "2222" }
             };
             _mockRepo.Setup(r => r.GetAll()).Returns(clientes);
 
             // Act
-            var resultado = _clienteService.ObtenerTodo();
+            var resultado = _service.ObtenerTodo();
 
             // Assert
             Assert.Equal(2, resultado.Count);
-            Assert.Equal("Juan", resultado[0].Nombre);
-            Assert.Equal("Ana", resultado[1].Nombre);
+            Assert.Equal("Juan", resultado.First().Nombre);
         }
 
         [Fact]
-        public void ObtenerPorId_ClienteExistente_RetornaCliente()
+        public void ObtenerPorId_ClienteExiste_DeberiaRetornarCliente()
         {
             // Arrange
-            var cliente = new Cliente { IdCliente = 1, DNI = "123", Nombre = "Juan", Telefono = "111" };
+            var cliente = new Cliente { IdCliente = 1, DNI = "123", Nombre = "Juan", Telefono = "1111" };
             _mockRepo.Setup(r => r.GetById(1)).Returns(cliente);
 
             // Act
-            var resultado = _clienteService.ObtenerPorId(1);
+            var resultado = _service.ObtenerPorId(1);
 
             // Assert
             Assert.NotNull(resultado);
@@ -55,77 +56,64 @@ namespace sve.Tests
         }
 
         [Fact]
-        public void ObtenerPorId_ClienteNoExistente_RetornaNull()
+        public void AgregarCliente_DeberiaLlamarAlRepositorioYRetornarId()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Cliente)null);
+            var dto = new ClienteCreateDto { DNI = "99999999", Nombre = "Carlos", Telefono = "1132302" };
+            _mockRepo.Setup(r => r.Add(It.IsAny<Cliente>())).Returns(10);
 
             // Act
-            var resultado = _clienteService.ObtenerPorId(99);
+            var resultado = _service.AgregarCliente(dto);
 
             // Assert
-            Assert.Null(resultado);
+            _mockRepo.Verify(r => r.Add(It.Is<Cliente>(c => c.Nombre == "Carlos")), Times.Once);
+            Assert.Equal(10, resultado);
         }
 
         [Fact]
-        public void AgregarCliente_Correctamente_RetornaId()
+        public void ActualizarCliente_ClienteExiste_DeberiaActualizarYRetornarUno()
         {
             // Arrange
-            var createDto = new ClienteCreateDto { DNI = "123", Nombre = "Juan", Telefono = "111" };
-            _mockRepo.Setup(r => r.Add(It.IsAny<Cliente>())).Returns(1);
+            var existente = new Cliente { IdCliente = 1, DNI = "111", Nombre = "Juan", Telefono = "5555" };
+            var dto = new ClienteUpdateDto { DNI = "222", Nombre = "Pedro", Telefono = "6666" };
+
+            _mockRepo.Setup(r => r.GetById(1)).Returns(existente);
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Cliente>())).Returns(1);
 
             // Act
-            var idNuevo = _clienteService.AgregarCliente(createDto);
+            var resultado = _service.ActualizarCliente(1, dto);
 
             // Assert
-            Assert.Equal(1, idNuevo);
-            _mockRepo.Verify(r => r.Add(It.IsAny<Cliente>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Cliente>(c => c.Nombre == "Pedro")), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void ActualizarCliente_ClienteExistente_RetornaTrue()
+        public void ActualizarCliente_ClienteNoExiste_DeberiaRetornarCero()
         {
             // Arrange
-            var clienteExistente = new Cliente { IdCliente = 1, DNI = "123", Nombre = "Juan", Telefono = "111" };
-            var updateDto = new ClienteUpdateDto { DNI = "999", Nombre = "Juan Actualizado", Telefono = "555" };
-
-            _mockRepo.Setup(r => r.GetById(1)).Returns(clienteExistente);
-            _mockRepo.Setup(r => r.Update(1, clienteExistente)).Returns(true);
+            var dto = new ClienteUpdateDto { DNI = "999", Nombre = "Nadie", Telefono = "0000" };
+            _mockRepo.Setup(r => r.GetById(1)).Returns((Cliente?)null);
 
             // Act
-            var resultado = _clienteService.ActualizarCliente(1, updateDto);
+            var resultado = _service.ActualizarCliente(1, dto);
 
             // Assert
-            Assert.True(resultado);
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Cliente>()), Times.Once);
+            Assert.Equal(0, resultado);
         }
 
         [Fact]
-        public void ActualizarCliente_ClienteNoExistente_RetornaFalse()
+        public void EliminarCliente_DeberiaLlamarRepositorioYRetornarUno()
         {
             // Arrange
-            var updateDto = new ClienteUpdateDto { DNI = "999", Nombre = "Juan Actualizado", Telefono = "555" };
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Cliente)null);
+            _mockRepo.Setup(r => r.Delete(1)).Returns(1);
 
             // Act
-            var resultado = _clienteService.ActualizarCliente(99, updateDto);
+            var resultado = _service.EliminarCliente(1);
 
             // Assert
-            Assert.False(resultado);
-        }
-
-        [Fact]
-        public void EliminarCliente_RetornaTrue()
-        {
-            // Arrange
-            _mockRepo.Setup(r => r.Delete(1)).Returns(true);
-
-            // Act
-            var resultado = _clienteService.EliminarCliente(1);
-
-            // Assert
-            Assert.True(resultado);
             _mockRepo.Verify(r => r.Delete(1), Times.Once);
+            Assert.Equal(1, resultado);
         }
     }
 }

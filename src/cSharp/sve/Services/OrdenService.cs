@@ -52,7 +52,7 @@ namespace sve.Services
             return _ordenRepository.Add(nuevaOrden);
         }
 
-        public bool ActualizarOrden(int id, OrdenUpdateDto orden)
+        public int ActualizarOrden(int id, OrdenUpdateDto orden)
         {
             var entidad = new Orden
             {
@@ -67,7 +67,7 @@ namespace sve.Services
             return _ordenRepository.Update(id, entidad);
         }
 
-        public bool EliminarOrden(int id)
+        public int EliminarOrden(int id)
         {
             return _ordenRepository.Delete(id);
         }

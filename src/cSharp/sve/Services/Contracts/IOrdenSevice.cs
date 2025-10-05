@@ -9,7 +9,7 @@ namespace sve.Services.Contracts
         List<OrdenDto> ObtenerTodo();
         Orden? ObtenerPorId(int id);
         int AgregarOrden(OrdenCreateDto orden);
-        bool ActualizarOrden(int id, OrdenUpdateDto orden);
-        bool EliminarOrden(int id);
+        int ActualizarOrden(int id, OrdenUpdateDto orden);
+        int EliminarOrden(int id);
     }
 }

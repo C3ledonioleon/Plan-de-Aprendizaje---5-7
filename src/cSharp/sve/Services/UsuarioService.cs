@@ -15,13 +15,13 @@ namespace sve.Services
             _usuarioRepository = _usuarioRepository;
         }
         // 🔹 Registro
-        public UsuarioDto Register(RegisterDto dto)
+        public UsuarioDto Register(RegisterDto usario)
         {
             var usuario = new Usuario
             {
-                Apodo = dto.Apodo,
-                Email = dto.Email,
-                contrasenia = dto.Contrasenia, // Ideal: encriptar
+                Apodo = usario.Apodo,
+                Email = usario.Email,
+                contrasenia = usario.Contrasenia, // Ideal: encriptar
                 Rol = RolUsuario.Cliente
             };
 
@@ -60,9 +60,9 @@ namespace sve.Services
         }
 
         // 🔹 Obtener perfil
-        public UsuarioDto GetProfile(int usuarioId)
+        public UsuarioDto GetProfile(int Id)
         {
-            var usuario = _usuarioRepository.GetById(usuarioId);
+            var usuario = _usuarioRepository.GetById(Id);
             if (usuario == null) throw new Exception("Usuario no encontrado");
 
             return new UsuarioDto
@@ -79,20 +79,20 @@ namespace sve.Services
             Enum.GetNames(typeof(RolUsuario)).ToList();
 
         // 🔹 Asignar rol
-        public UsuarioDto AsignarRol(int usuarioId, UsuarioRolDto dto)
+        public UsuarioDto AsignarRol(int id, UsuarioRolDto usuario)
         {
-            var usuario = _usuarioRepository.GetById(usuarioId);
+            var usuarioExistente = _usuarioRepository.GetById(id);
             if (usuario == null) throw new Exception("Usuario no encontrado");
 
-            usuario.Rol = Enum.Parse<RolUsuario>(dto.Rol);
-            _usuarioRepository.Update(usuario);
-
+            usuarioExistente.Rol = usuarioExistente.Rol;
+            _usuarioRepository.Update(usuarioExistente.IdUsuario, usuarioExistente);
+  
             return new UsuarioDto
             {
-                IdUsuario = usuario.IdUsuario,
-                Apodo = usuario.Apodo,
-                Email = usuario.Email,
-                Rol = usuario.Rol.ToString()
+                IdUsuario = usuarioExistente.IdUsuario,
+                Apodo = usuarioExistente.Apodo,
+                Email = usuarioExistente.Email,
+                Rol = usuarioExistente.Rol.ToString()
             };
         }
 
@@ -110,58 +110,56 @@ namespace sve.Services
             // En una implementación real eliminar token de BD o invalidarlo
         }
         public List<UsuarioDto> ObtenerTodo()
-{
-    var usuarios = _usuarioRepository.GetAll();
-    return usuarios.Select(u => new UsuarioDto {
-        IdUsuario = u.IdUsuario,
-        Apodo = u.Apodo,
-        Email = u.Email,
-        Rol = u.Rol.ToString()
-    }).ToList();
-}
+        {
+            var usuarios = _usuarioRepository.GetAll();
+            return usuarios.Select(u => new UsuarioDto {
+                IdUsuario = u.IdUsuario,
+                Apodo = u.Apodo,
+                Email = u.Email,
+                Rol = u.Rol.ToString()
+            }).ToList();
+        }
 
-public int AgregarUsuario(RegisterDto dto)
-{
-    var usuario = new Usuario
-    {
-        Apodo = dto.Apodo,
-        Email = dto.Email,
-        contrasenia = dto.Contrasenia,
-        Rol = RolUsuario.Cliente
-    };
-    _usuarioRepository.Add(usuario);
-    return usuario.IdUsuario;
-}
+        public int AgregarUsuario(RegisterDto dto)
+        {
+            var usuario = new Usuario
+            {
+                Apodo = dto.Apodo,
+                Email = dto.Email,
+                contrasenia = dto.Contrasenia,
+                Rol = RolUsuario.Cliente
+            };
+            _usuarioRepository.Add(usuario);
+            return usuario.IdUsuario;
+        }
 
-public UsuarioDto? ObtenerPorId(int id)
-{
-    var usuario = _usuarioRepository.GetById(id);
-    if (usuario == null) return null;
-    return new UsuarioDto
-    {
-        IdUsuario = usuario.IdUsuario,
-        Apodo = usuario.Apodo,
-        Email = usuario.Email,
-        Rol = usuario.Rol.ToString()
-    };
-}
-
-public bool ActualizarUsuario(int id, UsuarioUpdateDto dto)
-{
-    var usuario = _usuarioRepository.GetById(id);
-    if (usuario == null) return false;
-    usuario.Apodo = dto.Apodo;
-    usuario.Email = dto.Email;
-    _usuarioRepository.Update(usuario);
-    return true;
-}
-
-public bool EliminarUsuario(int id)
-{
-    var usuario = _usuarioRepository.GetById(id);
-    if (usuario == null) return false;
-    _usuarioRepository.Delete(id);
-    return true;
-}
-    }
-}
+        public UsuarioDto? ObtenerPorId(int id)
+        {
+            var usuario = _usuarioRepository.GetById(id);
+            if (usuario == null) return null;
+            return new UsuarioDto
+            {
+                IdUsuario = usuario.IdUsuario,
+                Apodo = usuario.Apodo,
+                Email = usuario.Email,
+                Rol = usuario.Rol.ToString()
+            };
+        }
+        public int ActualizarUsuario(int id, UsuarioUpdateDto usuario)
+        {
+            var usuarioExistente = _usuarioRepository.GetById(id);
+            if (usuario == null) return 0;
+              usuarioExistente.Apodo = usuarioExistente.Apodo;
+              usuarioExistente.Email = usuarioExistente.Email;
+             _usuarioRepository.Update(usuarioExistente.IdUsuario, usuarioExistente);
+            return 1;
+        }
+        public int EliminarUsuario(int id)
+        {
+            var usuario = _usuarioRepository.GetById(id);
+            if (usuario == null) return 0;
+            _usuarioRepository.Delete(id);
+            return 1;
+        }
+            }
+        }

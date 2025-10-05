@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using sve.Services;
 using sve_api.Models;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -21,16 +23,14 @@ builder.Services.AddSwaggerGen();
 //    )
 //);
 
+var connectionString = builder.Configuration.GetConnectionString("myBD");
+
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqlConnection(connectionString));
+    new MySqlConnection(connectionString));
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<SveContext>();
-    db.Database.Migrate();
-}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,113 +1,115 @@
-﻿using Moq;
-using Xunit;
+﻿using Xunit;
+using Moq;
+using System.Collections.Generic;
+using System.Linq;
+using sve.Services;
+using sve.Repositories.Contracts;
 using sve.Models;
 using sve.DTOs;
-using sve.Repositories.Contracts;
-using sve.Services;
 
-namespace sve.Tests
+namespace sve.Tests.Services
 {
     public class SectorServiceTests
     {
         private readonly Mock<ISectorRepository> _mockRepo;
-        private readonly SectorService _sectorService;
+        private readonly SectorService _service;
 
         public SectorServiceTests()
         {
             _mockRepo = new Mock<ISectorRepository>();
-            _sectorService = new SectorService(_mockRepo.Object);
+            _service = new SectorService(_mockRepo.Object);
         }
 
         [Fact]
-        public void ObtenerTodo_RetornaListaSectorDto()
+        public void ObtenerTodo_RetornaListaDeSectorDto()
         {
             // Arrange
             var sectores = new List<Sector>
             {
-                new Sector { IdSector = 1, Nombre = "A", Capacidad = 100, IdLocal = 1 },
-                new Sector { IdSector = 2, Nombre = "B", Capacidad = 200, IdLocal = 1 }
+                new Sector { IdSector = 1, Nombre = "Sector1", Capacidad = 100, IdLocal = 1 },
+                new Sector { IdSector = 2, Nombre = "Sector2", Capacidad = 200, IdLocal = 1 }
             };
             _mockRepo.Setup(r => r.GetAll()).Returns(sectores);
 
             // Act
-            var resultado = _sectorService.ObtenerTodo();
+            var resultado = _service.ObtenerTodo();
 
             // Assert
             Assert.Equal(2, resultado.Count);
-            Assert.Equal("A", resultado[0].Nombre);
-            Assert.Equal("B", resultado[1].Nombre);
+            Assert.Equal("Sector1", resultado[0].Nombre);
+            Assert.Equal("Sector2", resultado[1].Nombre);
         }
 
         [Fact]
         public void ObtenerPorId_Existente_RetornaSector()
         {
             // Arrange
-            var sector = new Sector { IdSector = 1, Nombre = "A", Capacidad = 100, IdLocal = 1 };
+            var sector = new Sector { IdSector = 1, Nombre = "Sector1", Capacidad = 100, IdLocal = 1 };
             _mockRepo.Setup(r => r.GetById(1)).Returns(sector);
 
             // Act
-            var resultado = _sectorService.ObtenerPorId(1);
+            var resultado = _service.ObtenerPorId(1);
 
             // Assert
             Assert.NotNull(resultado);
-            Assert.Equal("A", resultado.Nombre);
+            Assert.Equal("Sector1", resultado.Nombre);
         }
 
         [Fact]
-        public void ObtenerPorId_NoExistente_RetornaNull()
+        public void ObtenerPorId_NoExiste_RetornaNull()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetById(99)).Returns((Sector)null);
+            _mockRepo.Setup(r => r.GetById(99)).Returns((Sector?)null);
 
             // Act
-            var resultado = _sectorService.ObtenerPorId(99);
+            var resultado = _service.ObtenerPorId(99);
 
             // Assert
             Assert.Null(resultado);
         }
 
         [Fact]
-        public void AgregarSector_Correctamente_RetornaId()
+        public void AgregarSector_DeberiaRetornarIdNuevo()
         {
             // Arrange
-            var createDto = new SectorCreateDto { Nombre = "C", Capacidad = 150, IdLocal = 1 };
-            _mockRepo.Setup(r => r.Add(It.IsAny<Sector>())).Returns(1);
+            var createDto = new SectorCreateDto { Nombre = "Sector1", Capacidad = 150, IdLocal = 1 };
+            _mockRepo.Setup(r => r.Add(It.IsAny<Sector>())).Returns(10);
 
             // Act
-            var idNuevo = _sectorService.AgregarSector(createDto);
+            var resultado = _service.AgregarSector(createDto);
 
             // Assert
-            Assert.Equal(1, idNuevo);
             _mockRepo.Verify(r => r.Add(It.IsAny<Sector>()), Times.Once);
+            Assert.Equal(10, resultado);
         }
 
         [Fact]
-        public void ActualizarSector_RetornaTrue()
+        public void ActualizarSector_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
-            var updateDto = new SectorUpdateDto { Nombre = "C Updated", Capacidad = 180, IdLocal = 1 };
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Sector>())).Returns(true);
+            var updateDto = new SectorUpdateDto { Nombre = "Sector1 Actualizado", Capacidad = 200, IdLocal = 1 };
+            _mockRepo.Setup(r => r.Update(1, It.IsAny<Sector>())).Returns(1);
 
             // Act
-            var resultado = _sectorService.ActualizarSector(1, updateDto);
+            var resultado = _service.ActualizarSector(1, updateDto);
 
             // Assert
-            Assert.True(resultado);
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Sector>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(1, It.Is<Sector>(s => s.Nombre == "Sector1 Actualizado" && s.Capacidad == 200)), Times.Once);
+            Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void EliminarSector_RetornaTrue()
+        public void EliminarSector_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
-            _mockRepo.Setup(r => r.Delete(1)).Returns(true);
+            _mockRepo.Setup(r => r.Delete(1)).Returns(1);
 
             // Act
-            var resultado = _sectorService.EliminarSector(1);
+            var resultado = _service.EliminarSector(1);
 
             // Assert
-            Assert.True(resultado);
             _mockRepo.Verify(r => r.Delete(1), Times.Once);
+            Assert.Equal(1, resultado);
         }
     }
 }

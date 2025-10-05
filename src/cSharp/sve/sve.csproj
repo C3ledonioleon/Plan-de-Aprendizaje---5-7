@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>sve_api</RootNamespace>
+    <RootNamespace>sve</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
         List<Cliente> GetAll();
         Cliente? GetById(int id);
         int Add(Cliente cliente);
-        bool Update(int id, Cliente cliente);
-        bool Delete(int id);
+        int Update(int id, Cliente cliente);
+        int Delete(int id);
     }
 }

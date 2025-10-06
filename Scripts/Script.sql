@@ -1,13 +1,8 @@
--- --------------------------------------------------
--- Reinicio del esquema Sve
--- --------------------------------------------------
+
 DROP DATABASE IF EXISTS SVE;
-CREATE DATABASE SVE CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE SVE ;
 USE SVE;
 
--- --------------------------------------------------
--- Tablas para el sistema Sve
--- --------------------------------------------------
 
 -- Usuario
 CREATE TABLE Usuario (
@@ -120,3 +115,5 @@ CREATE TABLE RefreshToken (
     UsuarioId INT NOT NULL,
     FOREIGN KEY (UsuarioId) REFERENCES Usuario(IdUsuario)
 );
+
+

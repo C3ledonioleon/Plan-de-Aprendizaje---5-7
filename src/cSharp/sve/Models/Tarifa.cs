@@ -16,7 +16,7 @@ namespace sve.Models
 
     public enum EstadoTarifa
     {
-        Activa,
-        Inactiva
+        Activa = 0,
+        Inactiva = 1
     }
 }

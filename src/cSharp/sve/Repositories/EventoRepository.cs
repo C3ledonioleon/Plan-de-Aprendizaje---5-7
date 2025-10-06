@@ -44,10 +44,10 @@ namespace sve.Repositories
             string sql = @"
                 UPDATE Evento 
                 SET Nombre = @Nombre,
-                Descripcion = @Descripcion
+                Descripcion = @Descripcion,
                 FechaInicio = @FechaInicio,
                 FechaFin = @FechaFin,
-                Estado = @Estado
+                Estado = @Estado,
                 WHERE IdEvento = @IdEvento";
             int rows = _connection.Execute(sql, evento );
             return rows > 0 ? evento.IdEvento  : 0;

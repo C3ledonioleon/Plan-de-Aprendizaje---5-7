@@ -36,8 +36,8 @@ public class UsuarioRepository : IUsuarioRepository
     public int Add(Usuario usuario)
     {
         string sql = @"
-        INSERT INTO Usuario (Username, Email, Password)
-        VALUES (@Username, @Email, @Password);
+        INSERT INTO Usuario (Username, Email, Password,Rol)
+        VALUES (@Username, @Email, @Password , @Rol);
         SELECT LAST_INSERT_ID();";
         int newId = _connection.ExecuteScalar<int>(sql, usuario);
         usuario.IdUsuario = newId;

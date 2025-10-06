@@ -17,8 +17,8 @@ namespace sve.Models
     }
     public enum EstadoFuncion
     {
-        Pendiente,  
-        Cancelada,   
-        Finalizada   
+        Pendiente = 0,  
+        Cancelada = 1,   
+        Finalizada = 2  
     }
 }

@@ -9,11 +9,11 @@ public class EntradaCreateDto
     public int IdTarifa { get; set; }
     public int IdCliente { get; set; }   // <-- Agregar
     public int IdFuncion { get; set; }
+    public EstadoEntrada Estado { get; set; }
 }
 
 public class EntradaUpdateDto : EntradaCreateDto
 {
-    public EstadoEntrada Estado { get; set; } // Permite actualizar el estado si fuera necesario
 }
 
 public class EntradaDto

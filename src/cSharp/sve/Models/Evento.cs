@@ -15,9 +15,9 @@ namespace sve.Models
     }
     public enum EstadoEvento
     {
-        Inactivo,
-        Publicado,
-        Cancelado
+        Inactivo = 0,
+        Publicado = 1,
+        Cancelado = 2
     }
 
 }

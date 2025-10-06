@@ -43,8 +43,8 @@ public class ClienteRepository : IClienteRepository
         UPDATE Cliente 
         SET Nombre = @Nombre,
             DNI = @DNI,
-            Telefono = @Telefono
-            IdUsuario = @IdUsuario
+            Telefono = @Telefono,
+            IdUsuario = @IdUsuario,
         WHERE IdCliente = @IdCliente";
         int rows = _connection.Execute(sql, cliente );
         return rows > 0 ? cliente.IdCliente : 0;

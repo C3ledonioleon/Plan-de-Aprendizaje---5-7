@@ -30,8 +30,8 @@ public class EntradaRepository : IEntradaRepository
     {
  
         string sql = @"
-                INSERT INTO Entrada (Precio, IdCliente, IdFuncion)
-                VALUES (@Precio, @IdCliente, @IdFuncion);
+                INSERT INTO Entrada (Precio, IdCliente, IdFuncion,IdTarifa, IdOrden )
+                VALUES (@Precio, @IdCliente, @IdFuncion, @Tarifa, @IdOrden );
                 SELECT LAST_INSERT_ID();";
 
         int newId = _connection.ExecuteScalar<int>(sql, entrada);
@@ -46,8 +46,10 @@ public class EntradaRepository : IEntradaRepository
                 UPDATE Entrada 
                 SET Precio = @Precio,
                 IdOrden = @IdOrden,
-                IdTarifa = @IdTarifa
-                Estado = @Estado
+                IdTarifa = @IdTarifa,
+                IdFuncion = @Funcion,
+                IdCliente = @IdCliente ,
+                Estado = @Estado,
                 WHERE IdEntrada = @IdEntrada";
         int rows = _connection.Execute(sql, entrada);
         return rows > 0 ? entrada.IdEntrada: 0;

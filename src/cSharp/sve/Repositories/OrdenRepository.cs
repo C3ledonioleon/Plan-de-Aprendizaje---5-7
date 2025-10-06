@@ -46,7 +46,7 @@ public class OrdenRepository : IOrdenRepository
                     Fecha = @Fecha,
                     Estado = @Estado,
                     IdCliente = @IdCliente,
-                    IdTarifa = @IdTarifa
+                    IdTarifa = @IdTarifa,
                 WHERE IdOrden = @IdOrden";
         int rows = _connection.Execute(sql, orden);
         return rows > 0 ? orden.IdOrden : 0;

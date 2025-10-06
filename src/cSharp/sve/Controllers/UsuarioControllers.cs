@@ -1,110 +1,109 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using sve.DTOs;
+using sve.Models;
 using sve.Services.Contracts;
+using System.Security.Claims;
+using static QRCoder.PayloadGenerator;
 
-namespace sve.Controllers
+namespace sve.Controllers;
+
+[ApiController]
+[Route("api/[controller]/[action]")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsuarioController : ControllerBase
+    private readonly IUsuarioService _usuarioService;
+
+    public AuthController(IUsuarioService usuarioService)
     {
-        private readonly IUsuarioService _usuarioService;
+        _usuarioService = usuarioService;
+    }
 
-        public UsuarioController(IUsuarioService usuarioService)
+    [HttpPost()]
+    public IActionResult Register([FromBody] RegisterDto dto)
+    {
+        try
         {
-            _usuarioService = usuarioService;
+            int id = _usuarioService.Register(dto);
+            return Ok(new { message = "Usuario registrado correctamente.", id });
         }
-
-        // 🔹 Registro de usuario
-        [HttpPost("auth/register")]
-        public IActionResult Register([FromBody] RegisterDto usuario)
+        catch (Exception ex)
         {
-            var usuarioId = _usuarioService.AgregarUsuario(usuario);
-            return Ok(new { IdUsuario = usuarioId });
+            return BadRequest(new { error = ex.Message });
         }
+    }
 
-        // 🔹 Login y devuelve token
-        [HttpPost("auth/login")]
-        public IActionResult Login([FromBody] LoginDto usuario)
+    [HttpPost()]
+    public IActionResult Login([FromBody] LoginDto dto)
+    {
+        try
         {
-            var auth = _usuarioService.Login(usuario);
-            return Ok(auth);
+            var tokens = _usuarioService.Login(dto);
+            return Ok(tokens);
         }
-
-        // 🔹 Refresh token
-        [HttpPost("auth/refresh")]
-        public IActionResult Refresh([FromBody] RefreshTokenDto usuario)
+        catch (Exception ex)
         {
-            var token = _usuarioService.RefreshToken(usuario);
-            return Ok(new { Token = token });
+            return Unauthorized(new { error = ex.Message });
         }
+    }
 
-        // 🔹 Logout
-        [HttpPost("auth/logout")]
-        public IActionResult Logout([FromBody] RefreshTokenDto usuario)
+    [HttpPost()]
+    public IActionResult Refresh([FromBody] string refreshToken)
+    {
+        try
         {
-            _usuarioService.Logout(usuario.Token);
-            return Ok();
+            var tokens = _usuarioService.Refresh(refreshToken);
+            return Ok(tokens);
         }
-
-        // 🔹 Perfil del usuario autenticado
-        [HttpGet("auth/me/{usuarioId}")]
-        public IActionResult Me(int usuarioId)
+        catch (Exception ex)
         {
-            var usuario = _usuarioService.GetProfile(usuarioId);
-            if (usuario == null) return NotFound();
-            return Ok(usuario);
+            return Unauthorized(new { error = ex.Message });
         }
+    }
 
-        // 🔹 Lista de roles disponibles
-        [HttpGet("auth/roles")]
-        public IActionResult Roles()
+    [Authorize]
+    [HttpPost()]
+    public IActionResult Logout()
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        _usuarioService.Logout(email);
+        return Ok(new { message = "Sesión cerrada correctamente." });
+    }
+
+    [Authorize]
+    [HttpGet()]
+    public IActionResult Me()
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        var rol = User.FindFirstValue(ClaimTypes.Role);
+
+        return Ok(new { email, rol });
+    }
+
+    [HttpGet()]
+    public IActionResult Roles()
+    {
+        var roles = Enum.GetNames(typeof(RolUsuario));
+        return Ok(roles);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    [HttpPost()]
+    public IActionResult AsignarRol(int usuarioId, [FromBody] RolUsuario nuevoRol)
+    {
+        try
         {
-            var roles = _usuarioService.GetRoles();
-            return Ok(roles);
+            var usuario = _usuarioService.GetById(usuarioId);
+            if (usuario == null)
+                return NotFound(new { error = "Usuario no encontrado." });
+
+            usuario.Rol = nuevoRol;
+            _usuarioService.UpdateRol(usuarioId, nuevoRol);
+            return Ok(new { message = $"Rol asignado: {nuevoRol}" });
         }
-
-        // 🔹 Asignar/cambiar rol de un usuario
-        [HttpPost("usuarios/{usuarioId}/roles")]
-        public IActionResult AsignarRol(int usuarioId, [FromBody] UsuarioRolDto usuario)
+        catch (Exception ex)
         {
-            var resultado = _usuarioService.AsignarRol(usuarioId, usuario);
-            return Ok(resultado);
-        }
-
-        // 🔹 Obtener todos los usuarios
-        [HttpGet("usuarios")]
-        public IActionResult ObtenerTodo()
-        {
-            var usuarios = _usuarioService.ObtenerTodo();
-            return Ok(usuarios);
-        }
-
-        // 🔹 Obtener usuario por ID
-        [HttpGet("usuarios/{id}")]
-        public IActionResult ObtenerPorId(int id)
-        {
-            var usuario = _usuarioService.ObtenerPorId(id);
-            if (usuario == null) return NotFound();
-            return Ok(usuario);
-        }
-
-        // 🔹 Actualizar usuario
-        [HttpPut("usuarios/{id}")]
-        public IActionResult ActualizarUsuario(int id, [FromBody] UsuarioUpdateDto usuario)
-        {
-            var result = _usuarioService.ActualizarUsuario(id, usuario);
-            if (result == 0) return NotFound();
-            return Ok();
-        }
-
-        // 🔹 Eliminar usuario
-        [HttpDelete("usuarios/{id}")]
-        public IActionResult EliminarUsuario(int id)
-        {
-            var result = _usuarioService.EliminarUsuario(id);
-            if (result == 0) return NotFound();
-            return Ok();
+            return BadRequest(new { error = ex.Message });
         }
     }
 }

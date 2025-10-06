@@ -10,7 +10,7 @@ public class Cliente
     public List<Orden> Ordenes { get; set; }
     public int IdUsuario { get; set; }
 
-    public Usuario Usuario { get; set; }
+    public Usuario? Usuario { get; set; }
 }
 
 

@@ -9,10 +9,10 @@ namespace sve.Services;
     {
         private readonly IClienteRepository _clienteRepository;
 
-        public ClienteService(IClienteRepository clienteRepository)
+    public ClienteService(IClienteRepository clienteRepository)
         {
             _clienteRepository = clienteRepository;
-        }
+    }
 
         public List<ClienteDto> ObtenerTodo()
         {
@@ -22,7 +22,8 @@ namespace sve.Services;
                     IdCliente = cliente.IdCliente,
                     DNI = cliente.DNI,
                     Nombre = cliente.Nombre,
-                    Telefono = cliente.Telefono
+                    Telefono = cliente.Telefono,
+                    IdUsuario = cliente.IdUsuario
                 })
                 .ToList();
         }
@@ -33,12 +34,12 @@ namespace sve.Services;
 
         public int AgregarCliente(ClienteCreateDto cliente)
         {
-            
             var nuevoCliente = new Cliente
             {
                 DNI = cliente.DNI,
                 Nombre = cliente.Nombre,
-                Telefono = cliente.Telefono
+                Telefono = cliente.Telefono,
+                IdUsuario = cliente.IdUsuario
             };
             return _clienteRepository.Add( nuevoCliente);
         }
@@ -52,8 +53,9 @@ namespace sve.Services;
             clienteExistente.DNI = cliente.DNI;
             clienteExistente.Nombre = cliente.Nombre;
             clienteExistente.Telefono = cliente.Telefono;
+            clienteExistente.IdUsuario = cliente.IdUsuario;
 
-            return _clienteRepository.Update(id, clienteExistente);
+        return _clienteRepository.Update(id, clienteExistente);
         }
         public int EliminarCliente(int id)
         {

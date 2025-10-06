@@ -27,9 +27,10 @@ namespace sve.Services
                     Total = orden.Total,
                     Fecha = orden.Fecha,
                     Estado = orden.Estado,
-                    Cliente = orden.Cliente,   // suponiendo que la entidad incluye la navegación
-                    Tarifa = orden.Tarifa,     // idem
-                    Entradas = orden.Entradas  // idem
+                    Cliente = orden.Cliente,  
+                    Tarifa = orden.Tarifa,     
+                    Entradas = orden.Entradas  
+
                 }).ToList();
         }
 
@@ -70,6 +71,16 @@ namespace sve.Services
         public int EliminarOrden(int id)
         {
             return _ordenRepository.Delete(id);
+        }
+
+        public bool CancelarOrden(int ordenId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool PagarOrden(int ordenId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

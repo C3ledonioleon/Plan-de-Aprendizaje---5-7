@@ -1,15 +1,28 @@
 -- --------------------------------------------------
+-- Reinicio del esquema Sve
+-- --------------------------------------------------
+DROP DATABASE IF EXISTS SVE;
+CREATE DATABASE SVE CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE SVE;
+
+-- --------------------------------------------------
 -- Tablas para el sistema Sve
 -- --------------------------------------------------
 
 -- Usuario
 CREATE TABLE Usuario (
     IdUsuario INT AUTO_INCREMENT PRIMARY KEY,
-    Apodo VARCHAR(100) NOT NULL,
-    Email VARCHAR(100) NOT NULL UNIQUE,
-    Contrasenia VARCHAR(255) NOT NULL,
-    Rol ENUM('Administrador','Empleado','Cliente') NOT NULL
+    Username VARCHAR(100) NOT NULL,
+    Email VARCHAR(150) NOT NULL UNIQUE,
+    Password VARCHAR(256) NOT NULL,
+    Rol INT NULL,
+    RefreshToken VARCHAR(255) NULL,
+    RefreshTokenExpiracion DATETIME NULL
 );
+
+-- INSERTAR USUARIO ADMINISTRADOR POR DEFECTO
+INSERT INTO Usuario (Username, Email, Password, Rol)
+VALUES ('admin', 'admin@admin', 'ef92b778bafe771e89245b89ecbcfbabf2b0e1b1b6b5c8232e1c4f7d5f7c5a3a', 1);
 
 -- Cliente
 CREATE TABLE Cliente (
@@ -28,7 +41,7 @@ CREATE TABLE Evento (
     Descripcion TEXT,
     FechaInicio DATETIME NOT NULL,
     FechaFin DATETIME NOT NULL,
-    Estado ENUM('Inactivo','Publicado','Cancelado') NOT NULL
+    Estado INT NOT NULL
 );
 
 -- Local
@@ -54,7 +67,7 @@ CREATE TABLE Funcion (
     IdEvento INT NOT NULL,
     IdLocal INT NOT NULL,
     FechaHora DATETIME NOT NULL,
-    Estado ENUM('Pendiente','Cancelada','Finalizada') NOT NULL,
+    Estado INT NOT NULL,
     FOREIGN KEY (IdEvento) REFERENCES Evento(IdEvento),
     FOREIGN KEY (IdLocal) REFERENCES Local(IdLocal)
 );
@@ -66,7 +79,7 @@ CREATE TABLE Tarifa (
     IdSector INT NOT NULL,
     Precio DECIMAL(10,2) NOT NULL,
     Stock INT NOT NULL,
-    Estado ENUM('Activa','Inactiva') NOT NULL,
+    Estado INT NOT NULL,
     FOREIGN KEY (IdFuncion) REFERENCES Funcion(IdFuncion),
     FOREIGN KEY (IdSector) REFERENCES Sector(IdSector)
 );
@@ -78,7 +91,7 @@ CREATE TABLE Orden (
     IdCliente INT NOT NULL,
     Total DECIMAL(10,2) NOT NULL,
     Fecha DATETIME NOT NULL,
-    Estado ENUM('Creada','Pagada','Cancelada') NOT NULL,
+    Estado INT NOT NULL,
     FOREIGN KEY (IdTarifa) REFERENCES Tarifa(IdTarifa),
     FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente)
 );
@@ -87,7 +100,7 @@ CREATE TABLE Orden (
 CREATE TABLE Entrada (
     IdEntrada INT AUTO_INCREMENT PRIMARY KEY,
     Precio DECIMAL(10,2) NOT NULL,
-    Estado ENUM('Activa','Anulada') NOT NULL,
+    Estado INT NOT NULL,
     IdOrden INT NOT NULL,
     IdTarifa INT NOT NULL,
     IdCliente INT NOT NULL,
@@ -98,7 +111,7 @@ CREATE TABLE Entrada (
     FOREIGN KEY (IdFuncion) REFERENCES Funcion(IdFuncion)
 );
 
--- RefreshToken
+-- RefreshToken (opcional si gestionás varios tokens por usuario)
 CREATE TABLE RefreshToken (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     Token VARCHAR(255) NOT NULL,

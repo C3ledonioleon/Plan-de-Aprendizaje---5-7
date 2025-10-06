@@ -8,11 +8,11 @@ namespace sve.DTOs
         public required string Descripcion { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
+        public EstadoEvento Estado { get; set; }
     }
 
     public class EventoUpdateDto : EventoCreateDto
-    {
-        public EstadoEvento Estado { get; set; } // Permite actualizar el estado si fuera necesario
+    { 
     }
 
     public class EventoDto 

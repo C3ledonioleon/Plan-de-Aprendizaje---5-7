@@ -19,8 +19,8 @@ namespace sve.Models
 
     public enum EstadoOrden
     {
-        Creada,   
-        Pagada,    
-        Cancelada  
+        Creada = 0,
+        Pagada = 1,
+        Cancelada = 2
     }
 }

@@ -7,7 +7,7 @@ namespace sve.Repositories.Contracts
             List<Funcion> GetAll();
             Funcion? GetById(int id);
             int Add(Funcion funcion);
-            int Update( int id ,Funcion funcion);
+            int Update(Funcion funcion);
             int Delete (int id);
     }
 }

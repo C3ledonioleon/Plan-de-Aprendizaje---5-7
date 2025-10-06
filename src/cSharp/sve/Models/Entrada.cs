@@ -9,12 +9,6 @@ namespace sve.Models
         public int IdTarifa { get; set; }
         public int IdCliente { get; set; }
         public int IdFuncion { get; set; }
-
-        public Orden Orden { get; set; }
-        public Tarifa Tarifa { get; set; }
-        public Funcion Funcion { get; set; }
-        public Cliente Cliente { get; set; }
-
     }
     public enum EstadoEntrada
     {

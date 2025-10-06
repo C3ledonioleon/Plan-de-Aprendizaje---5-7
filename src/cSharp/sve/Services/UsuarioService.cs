@@ -1,165 +1,142 @@
+using Microsoft.IdentityModel.Tokens;
 using sve.DTOs;
 using sve.Models;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 
-namespace sve.Services
+namespace sve.Services;
+
+public class UsuarioService : IUsuarioService
 {
-    public class UsuarioService : IUsuarioService
+    private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IConfiguration _configuration;
+
+    public UsuarioService(IUsuarioRepository usuarioRepository, IConfiguration configuration)
     {
-        private readonly IUsuarioRepository _usuarioRepository;
+        _usuarioRepository = usuarioRepository;
+        _configuration = configuration;
+    }
 
-        public UsuarioService(IUsuarioRepository _usuarioRepository)
+    public int Register(RegisterDto registerDto)
+    {
+        if (_usuarioRepository.GetByEmail(registerDto.Email) != null)
+            throw new Exception("El email ya está registrado.");
+
+        var usuario = new Usuario
         {
-            _usuarioRepository = _usuarioRepository;
-        }
-        // 🔹 Registro
-        public UsuarioDto Register(RegisterDto usario)
+            Username = registerDto.Username,
+            Email = registerDto.Email,
+            Password = HashPassword(registerDto.Contraseña)
+        };
+
+        return _usuarioRepository.Add(usuario);
+    }
+
+    public TokenDto Login(LoginDto loginDto)
+    {
+        var usuario = _usuarioRepository.GetByEmail(loginDto.Email);
+
+        if (usuario == null)
+            throw new Exception("Usuario no encontrado.");
+
+        if (usuario.Password != HashPassword(loginDto.Contraseña))
+            throw new Exception("Contraseña incorrecta.");
+
+        string token = GenerateJwtToken(usuario);
+        string refreshToken = GenerateRefreshToken();
+
+        _usuarioRepository.UpdateRefreshToken(usuario.Email, refreshToken, DateTime.UtcNow.AddDays(7));
+
+        return new TokenDto
         {
-            var usuario = new Usuario
-            {
-                Apodo = usario.Apodo,
-                Email = usario.Email,
-                contrasenia = usario.Contrasenia, // Ideal: encriptar
-                Rol = RolUsuario.Cliente
-            };
+            Token = token,
+            RefreshToken = refreshToken
+        };
+    }
 
-            _usuarioRepository.Add(usuario);
+    public TokenDto Refresh(string refreshToken)
+    {
+        var usuario = _usuarioRepository.GetByRefreshToken(refreshToken)
+            ?? throw new Exception("Token inválido o expirado.");
 
-            return new UsuarioDto
-            {
-                IdUsuario = usuario.IdUsuario,
-                Apodo = usuario.Apodo,
-                Email = usuario.Email,
-                Rol = usuario.Rol.ToString()
-            };
-        }
+        string newAccessToken = GenerateJwtToken(usuario);
+        string newRefreshToken = GenerateRefreshToken();
 
-        // 🔹 Login
-        public AuthResponseDto Login(LoginDto dto)
+        _usuarioRepository.UpdateRefreshToken(usuario.Email, newRefreshToken, DateTime.UtcNow.AddDays(7));
+
+        return new TokenDto
         {
-            var usuario = _usuarioRepository.GetByEmail(dto.Email);
-            if (usuario == null || usuario.contrasenia != dto.Contrasenia)
-                throw new Exception("Usuario o contraseña incorrectos");
+            Token = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+    }
 
-            // Generar token
-            var token = Guid.NewGuid().ToString(); // Para simplificar, en real usar JWT
+    public void Logout(string email)
+    {
+        _usuarioRepository.UpdateRefreshToken(email, null, DateTime.UtcNow);
+    }
 
-            return new AuthResponseDto
-            {
-                Token = token,
-                Usuario = new UsuarioDto
-                {
-                    IdUsuario = usuario.IdUsuario,
-                    Apodo = usuario.Apodo,
-                    Email = usuario.Email,
-                    Rol = usuario.Rol.ToString()
-                }
-            };
-        }
+    public Usuario? GetById(int idUsuario)
+    {
+        return _usuarioRepository.GetById(idUsuario);
+    }
 
-        // 🔹 Obtener perfil
-        public UsuarioDto GetProfile(int Id)
+    private string GenerateJwtToken(Usuario usuario)
+    {
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings:SecretKey").Value));
+        var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
         {
-            var usuario = _usuarioRepository.GetById(Id);
-            if (usuario == null) throw new Exception("Usuario no encontrado");
+            new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
+            new Claim(ClaimTypes.Role, usuario.Rol.ToString())
+        };
 
-            return new UsuarioDto
-            {
-                IdUsuario = usuario.IdUsuario,
-                Apodo = usuario.Apodo,
-                Email = usuario.Email,
-                Rol = usuario.Rol.ToString()
-            };
-        }
+        var token = new JwtSecurityToken(
+            issuer: _configuration.GetSection("JwtSettings:Issuer").Value,
+            audience: _configuration.GetSection("JwtSettings:Audience").Value,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(_configuration.GetSection("JwtSettings:TokenExpirationMinutes").Get<int>()),
+            signingCredentials: credentials
+        );
 
-        // 🔹 Obtener roles disponibles
-        public List<string> GetRoles() =>
-            Enum.GetNames(typeof(RolUsuario)).ToList();
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 
-        // 🔹 Asignar rol
-        public UsuarioDto AsignarRol(int id, UsuarioRolDto usuario)
+    private string GenerateRefreshToken()
+    {
+        var randomBytes = new byte[32];
+        using (var rng = RandomNumberGenerator.Create())
         {
-            var usuarioExistente = _usuarioRepository.GetById(id);
-            if (usuario == null) throw new Exception("Usuario no encontrado");
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+    }
 
-            usuarioExistente.Rol = usuarioExistente.Rol;
-            _usuarioRepository.Update(usuarioExistente.IdUsuario, usuarioExistente);
-  
-            return new UsuarioDto
-            {
-                IdUsuario = usuarioExistente.IdUsuario,
-                Apodo = usuarioExistente.Apodo,
-                Email = usuarioExistente.Email,
-                Rol = usuarioExistente.Rol.ToString()
-            };
+    private string HashPassword(string password)
+    {
+        using (var sha = SHA256.Create())
+        {
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
         }
+    }
 
-        // 🔹 Refresh token (ejemplo simple)
-        public string RefreshToken(RefreshTokenDto dto)
-        {
-            // Validar token existente, etc.
-            // Para simplificar, generamos uno nuevo
-            return Guid.NewGuid().ToString();
-        }
+    public int UpdateRol(int idUsuario, RolUsuario nuevoRol)
+    {
+        var usuario = _usuarioRepository.GetById(idUsuario);
+        if (usuario == null)
+            throw new Exception("Usuario no encontrado.");
 
-        // 🔹 Logout
-        public void Logout(string token)
-        {
-            // En una implementación real eliminar token de BD o invalidarlo
-        }
-        public List<UsuarioDto> ObtenerTodo()
-        {
-            var usuarios = _usuarioRepository.GetAll();
-            return usuarios.Select(u => new UsuarioDto {
-                IdUsuario = u.IdUsuario,
-                Apodo = u.Apodo,
-                Email = u.Email,
-                Rol = u.Rol.ToString()
-            }).ToList();
-        }
+        usuario.Rol = nuevoRol;
 
-        public int AgregarUsuario(RegisterDto dto)
-        {
-            var usuario = new Usuario
-            {
-                Apodo = dto.Apodo,
-                Email = dto.Email,
-                contrasenia = dto.Contrasenia,
-                Rol = RolUsuario.Cliente
-            };
-            _usuarioRepository.Add(usuario);
-            return usuario.IdUsuario;
-        }
+        return _usuarioRepository.Update(usuario);
+    }
 
-        public UsuarioDto? ObtenerPorId(int id)
-        {
-            var usuario = _usuarioRepository.GetById(id);
-            if (usuario == null) return null;
-            return new UsuarioDto
-            {
-                IdUsuario = usuario.IdUsuario,
-                Apodo = usuario.Apodo,
-                Email = usuario.Email,
-                Rol = usuario.Rol.ToString()
-            };
-        }
-        public int ActualizarUsuario(int id, UsuarioUpdateDto usuario)
-        {
-            var usuarioExistente = _usuarioRepository.GetById(id);
-            if (usuario == null) return 0;
-              usuarioExistente.Apodo = usuarioExistente.Apodo;
-              usuarioExistente.Email = usuarioExistente.Email;
-             _usuarioRepository.Update(usuarioExistente.IdUsuario, usuarioExistente);
-            return 1;
-        }
-        public int EliminarUsuario(int id)
-        {
-            var usuario = _usuarioRepository.GetById(id);
-            if (usuario == null) return 0;
-            _usuarioRepository.Delete(id);
-            return 1;
-        }
-            }
-        }
+}
+    

@@ -26,8 +26,8 @@ namespace sve.Tests.Services
             // Arrange
             var tarifas = new List<Tarifa>
             {
-                new Tarifa { IdTarifa = 1, IdFuncion = 1, IdSector = 1, Precio = 100, Stock = 50, Estado = true },
-                new Tarifa { IdTarifa = 2, IdFuncion = 2, IdSector = 2, Precio = 200, Stock = 30, Estado = true }
+                new Tarifa { IdTarifa = 1, IdFuncion = 1, IdSector = 1, Precio = 100, Stock = 50, Estado = EstadoTarifa.Activa },
+                new Tarifa { IdTarifa = 2, IdFuncion = 2, IdSector = 2, Precio = 200, Stock = 30, Estado = EstadoTarifa.Activa }
             };
             _mockRepo.Setup(r => r.GetAll()).Returns(tarifas);
 
@@ -44,7 +44,7 @@ namespace sve.Tests.Services
         public void ObtenerPorId_Existente_RetornaTarifaDto()
         {
             // Arrange
-            var tarifa = new Tarifa { IdTarifa = 1, IdFuncion = 1, IdSector = 1, Precio = 150, Stock = 20, Estado = true };
+            var tarifa = new Tarifa { IdTarifa = 1, IdFuncion = 1, IdSector = 1, Precio = 150, Stock = 20, Estado = EstadoTarifa.Activa };
             _mockRepo.Setup(r => r.GetById(1)).Returns(tarifa);
 
             // Act
@@ -72,7 +72,7 @@ namespace sve.Tests.Services
         public void AgregarTarifa_DeberiaRetornarIdNuevo()
         {
             // Arrange
-            var createDto = new TarifaCreateDto { IdFuncion = 1, IdSector = 1, Precio = 200, Stock = 10, Estado = true };
+            var createDto = new TarifaCreateDto { IdFuncion = 1, IdSector = 1, Precio = 200, Stock = 10, Estado = EstadoTarifa.Activa };
             _mockRepo.Setup(r => r.Add(It.IsAny<Tarifa>())).Returns(5);
 
             // Act
@@ -87,7 +87,7 @@ namespace sve.Tests.Services
         public void ActualizarTarifa_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
-            var updateDto = new TarifaUpdateDto { Precio = 250, Stock = 15, Estado = true };
+            var updateDto = new TarifaUpdateDto { Precio = 250, Stock = 15, Estado = EstadoTarifa.Activa };
             _mockRepo.Setup(r => r.Update(1, It.IsAny<Tarifa>())).Returns(1);
 
             // Act

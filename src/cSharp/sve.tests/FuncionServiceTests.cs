@@ -1,13 +1,12 @@
 ﻿using Xunit;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using sve.Services;
-using sve.Services.Contracts;
-using sve.Repositories.Contracts;
 using sve.Models;
+using sve.Repositories.Contracts;
+using sve.Services;
 using sve.DTOs;
-using System;
 
 namespace sve.Tests.Services
 {
@@ -85,22 +84,22 @@ namespace sve.Tests.Services
         }
 
         [Fact]
-        public void ActualizarFuncion_DeberiaLlamarRepositorioYRetornarUno()
+        public void ActualizarFuncion_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
             var dto = new FuncionUpdateDto { IdEvento = 1, IdLocal = 2, FechaHora = DateTime.Now, Estado = EstadoFuncion.Pendiente };
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Funcion>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Funcion>())).Returns(1);
 
             // Act
             var resultado = _service.ActualizarFuncion(1, dto);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Funcion>(f => f.IdEvento == 1 && f.IdLocal == 2)), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Funcion>(f => f.IdEvento == 1 && f.IdLocal == 2)), Times.Once);
             Assert.Equal(1, resultado);
         }
 
         [Fact]
-        public void EliminarFuncion_DeberiaLlamarRepositorioYRetornarUno()
+        public void EliminarFuncion_DeberiaLlamarRepositorioYRetornarId()
         {
             // Arrange
             _mockRepo.Setup(r => r.Delete(1)).Returns(1);
@@ -114,19 +113,32 @@ namespace sve.Tests.Services
         }
 
         [Fact]
-        public void CancelarFuncion_Existe_DeberiaCambiarEstadoYRetornarUno()
+        public void CancelarFuncion_Existe_DeberiaCambiarEstadoYRetornarId()
         {
             // Arrange
             var funcion = new Funcion { IdFuncion = 1, IdEvento = 1, IdLocal = 1, FechaHora = DateTime.Now, Estado = EstadoFuncion.Pendiente };
             _mockRepo.Setup(r => r.GetById(1)).Returns(funcion);
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Funcion>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Funcion>())).Returns(1);
 
             // Act
             var resultado = _service.CancelarFuncion(1);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Funcion>(f => f.Estado == EstadoFuncion.Cancelada)), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Funcion>(f => f.Estado == EstadoFuncion.Cancelada)), Times.Once);
             Assert.Equal(1, resultado);
+        }
+
+        [Fact]
+        public void CancelarFuncion_NoExiste_DeberiaRetornarCero()
+        {
+            // Arrange
+            _mockRepo.Setup(r => r.GetById(1)).Returns((Funcion?)null);
+
+            // Act
+            var resultado = _service.CancelarFuncion(1);
+
+            // Assert
+            Assert.Equal(0, resultado);
         }
     }
 }

@@ -10,6 +10,14 @@ public static class StartupExtension
         services.AddScoped<IClienteService, ClienteService>();
         services.AddScoped<IEntradaService, EntradaService>();
         services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IEventoService, EventoService>();
+        services.AddScoped<IFuncionService, FuncionService>();
+        services.AddScoped<ILocalService, LocalService>();
+        services.AddScoped<IOrdenService, OrdenService>();
+        services.AddScoped<ISectorService, SectorService>();
+        services.AddScoped<ITarifaService, TarifaService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
+
         
         return services;
     }
@@ -17,21 +25,13 @@ public static class StartupExtension
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddTransient<IClienteRepository, ClienteRepository>();
-
         services.AddTransient<IEntradaRepository, EntradaRepository>();
-
         services.AddTransient<IEventoRepository, EventoRepository>();
-
         services.AddTransient<IFuncionRepository, FuncionRepository>();
-
         services.AddTransient<ILocalRepository, LocalRepository>();
-
         services.AddTransient<IOrdenRepository, OrdenRepository>();
-
         services.AddTransient<ISectorRepository, SectorRepository>();
-
         services.AddTransient<ITarifaRepository, TarifaRepository>();
-
         services.AddTransient<IUsuarioRepository, UsuarioRepository>();
         
 

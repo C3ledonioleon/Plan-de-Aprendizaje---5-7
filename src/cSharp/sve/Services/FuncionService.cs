@@ -55,7 +55,7 @@ namespace sve.Services
                 Estado = funcion.Estado
             };
 
-            return _funcionRepository.Update(id, entidad);
+            return _funcionRepository.Update(entidad);
         }
 
         public int EliminarFuncion(int id)

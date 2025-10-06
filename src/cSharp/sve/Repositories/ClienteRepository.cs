@@ -52,12 +52,6 @@ public class ClienteRepository : IClienteRepository
 
     public int Delete(int id)
     {
-        var checkSql = "SELECT COUNT(*) FROM Entrada WHERE IdCliente = @IdCliente";
-        var count = _connection.ExecuteScalar<int>(checkSql, new { IdCliente = id });
-
-        if (count > 0)
-            return 0;
-
         string sql = "DELETE FROM Cliente WHERE IdCliente = @IdCliente";
         int rows = _connection.Execute(sql, new { IdCliente = id });
         return rows > 0 ? id : 0;

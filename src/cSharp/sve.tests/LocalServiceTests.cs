@@ -89,13 +89,13 @@ namespace sve.Tests.Services
         {
             // Arrange
             var updateDto = new LocalUpdateDto { Nombre = "LocalActualizado", Direccion = "Calle Actual", CapacidadTotal = 180 };
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Local>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Local>())).Returns(1);
 
             // Act
             var resultado = _service.ActualizarLocal(1, updateDto);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.IsAny<Local>()), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.IsAny<Local>()), Times.Once);
             Assert.Equal(1, resultado);
         }
 

@@ -39,7 +39,7 @@ public class EntradaRepository : IEntradaRepository
         return newId;
     }
 
-    public int Update(int id, Entrada entrada)
+    public int Update(Entrada entrada)
     {
 
         string sql = @"

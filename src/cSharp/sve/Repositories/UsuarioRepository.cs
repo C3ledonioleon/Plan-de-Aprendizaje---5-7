@@ -59,12 +59,6 @@ public class UsuarioRepository : IUsuarioRepository
 
     public int Delete(int id)
     {
-        var checkSql = "SELECT COUNT(*) FROM Cliente WHERE IdUsuario = @IdUsuario";
-        var count = _connection.ExecuteScalar<int>(checkSql, new { IdUsuario = id });
-
-        if (count > 0)
-            return 0;
-
         string sql = "DELETE FROM Usuario WHERE IdUsuario = @IdUsuario";
         int rows = _connection.Execute(sql, new { IdUsuario = id });
         return rows > 0 ? id : 0;

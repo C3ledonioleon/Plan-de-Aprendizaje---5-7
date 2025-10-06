@@ -15,7 +15,6 @@ namespace sve.Controllers
             _entradaService = entradaService;
         }
 
-        // GET /api/entradas — Listar todas las entradas
         [HttpGet]
         public ActionResult<List<EntradaDto>> ObtenerEntradas()
         {
@@ -23,7 +22,6 @@ namespace sve.Controllers
             return Ok(entradas);
         }
 
-        // GET /api/entradas/{entradaId} — Obtener entrada por ID
         [HttpGet("{entradaId}")]
         public ActionResult<EntradaDto> ObtenerEntradaPorId(int entradaId)
         {
@@ -34,7 +32,6 @@ namespace sve.Controllers
             return Ok(entrada);
         }
 
-        // POST /api/entradas — Crear nueva entrada
         [HttpPost]
         public ActionResult CrearEntrada([FromBody] EntradaCreateDto entrada)
         {
@@ -42,7 +39,6 @@ namespace sve.Controllers
             return CreatedAtAction(nameof(ObtenerEntradaPorId), new { entradaId = id }, entrada);
         }
 
-        // PUT /api/entradas/{entradaId} — Actualizar entrada
         [HttpPut("{entradaId}")]
         public IActionResult ActualizarEntrada(int entradaId, [FromBody] EntradaUpdateDto entrada)
         {
@@ -52,17 +48,15 @@ namespace sve.Controllers
             return NoContent();
         }
 
-        // POST /api/entradas/{entradaId}/anular — Anular entrada
         [HttpPost("{entradaId}/anular")]
         public IActionResult AnularEntrada(int entradaId)
         {
             var resultado = _entradaService.AnularEntrada(entradaId);
-            if (resultado == 0) return NotFound($"No se encontró la entrada con ID {entradaId}");
+            if (resultado == false) return NotFound($"No se encontró la entrada con ID {entradaId}");
 
             return Ok($"La entrada con ID {entradaId} fue anulada correctamente.");
         }
 
-        // DELETE /api/entradas/{entradaId} — Eliminar entrada
         [HttpDelete("{entradaId}")]
         public IActionResult EliminarEntrada(int entradaId)
         {

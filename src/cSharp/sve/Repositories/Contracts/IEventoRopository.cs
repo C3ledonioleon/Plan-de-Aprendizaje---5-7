@@ -1,13 +1,12 @@
 using sve.Models;
 
-namespace sve.Repositories.Contracts
+namespace sve.Repositories.Contracts;
+
+public interface IEventoRepository
 {
-    public interface IEventoRepository
-    {
-        List<Evento> GetAll();
-        Evento? GetById(int id);
-        int Add(Evento evento);
-        int Update(int id, Evento evento);
-        int Delete(int id);
-    }
+    List<Evento> GetAll();
+    Evento? GetById(int id);
+    int Add(Evento evento);
+    int Update(Evento evento);
+    int Delete(int id);
 }

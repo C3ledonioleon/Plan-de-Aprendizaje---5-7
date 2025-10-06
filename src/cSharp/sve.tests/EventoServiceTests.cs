@@ -88,13 +88,13 @@ namespace sve.Tests.Services
         {
             // Arrange
             var dto = new EventoUpdateDto { Nombre = "Update", Descripcion = "Desc", FechaInicio = System.DateTime.Now, FechaFin = System.DateTime.Now.AddDays(1), Estado = EstadoEvento.Publicado };
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Evento>())).Returns(1);
 
             // Act
             var resultado = _service.ActualizarEvento(1, dto);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Nombre == "Update")), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Evento>(e => e.Nombre == "Update")), Times.Once);
             Assert.Equal(1, resultado);
         }
 
@@ -118,13 +118,13 @@ namespace sve.Tests.Services
             // Arrange
             var evento = new Evento { IdEvento = 1, Estado = EstadoEvento.Inactivo };
             _mockRepo.Setup(r => r.GetById(1)).Returns(evento);
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Evento>())).Returns(1);
 
             // Act
             var resultado = _service.Publicar(1);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Estado == EstadoEvento.Publicado)), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Evento>(e => e.Estado == EstadoEvento.Publicado)), Times.Once);
             Assert.Equal(1, resultado);
         }
 
@@ -134,13 +134,13 @@ namespace sve.Tests.Services
             // Arrange
             var evento = new Evento { IdEvento = 1, Estado = EstadoEvento.Publicado };
             _mockRepo.Setup(r => r.GetById(1)).Returns(evento);
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Evento>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Evento>())).Returns(1);
 
             // Act
             var resultado = _service.Cancelar(1);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Evento>(e => e.Estado == EstadoEvento.Cancelado)), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Evento>(e => e.Estado == EstadoEvento.Cancelado)), Times.Once);
             Assert.Equal(1, resultado);
         }
     }

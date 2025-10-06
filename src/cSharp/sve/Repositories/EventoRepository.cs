@@ -39,9 +39,8 @@ namespace sve.Repositories
             evento.IdEvento = newId;
             return newId;
         }
-        public int Update(int id, Evento evento)
+        public int Update(Evento evento)
         {
-
             string sql = @"
                 UPDATE Evento 
                 SET Nombre = @Nombre,

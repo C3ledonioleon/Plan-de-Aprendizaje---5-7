@@ -3,93 +3,82 @@ using sve.Models;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
 
-namespace sve.Services
+namespace sve.Services;
+
+public class EventoService : IEventoService
 {
-    public class EventoService : IEventoService
+    private readonly IEventoRepository _eventoRepository;
+
+    public EventoService(IEventoRepository eventoRepository)
     {
-        private readonly IEventoRepository _eventoRepository;
+        _eventoRepository = eventoRepository;
+    }
 
-        public EventoService(IEventoRepository eventoRepository)
+    public List<EventoDto> ObtenerTodo()
+    {
+        var eventos = _eventoRepository.GetAll();
+        return eventos.Select(evento => new EventoDto
         {
-            _eventoRepository = eventoRepository;
-        }
+            IdEvento = evento.IdEvento,
+            Nombre = evento.Nombre,
+            Descripcion = evento.Descripcion,
+            FechaInicio = evento.FechaInicio,
+            FechaFin = evento.FechaFin,
+            Estado = evento.Estado
+        }).ToList();
+    }
 
-        public List<EventoDto> ObtenerTodo()
-        {
-            var eventos = _eventoRepository.GetAll();
-            return eventos.Select(evento => new EventoDto
-            {
-                IdEvento = evento.IdEvento,
-                Nombre = evento.Nombre,
-                Descripcion = evento.Descripcion,
-                FechaInicio = evento.FechaInicio,
-                FechaFin = evento.FechaFin,
-                Estado = evento.Estado
-            }).ToList();
-        }
+    public Evento? ObtenerPorId(int id)
+    {
+        return _eventoRepository.GetById(id);
+    }
 
-        public Evento? ObtenerPorId(int id)
+    public int AgregarEvento(EventoCreateDto evento)
+    {
+        var nuevoEvento = new Evento
         {
-            var evento = _eventoRepository.GetById(id);
-            if (evento == null) return null;
-            return new Evento
-            {
-                IdEvento = evento.IdEvento,
-                Nombre = evento.Nombre,
-                Descripcion = evento.Descripcion,
-                FechaInicio = evento.FechaInicio,
-                FechaFin = evento.FechaFin,
-                Estado = evento.Estado
-            };
-        }
-
-        public int AgregarEvento(EventoCreateDto evento)
+            Nombre = evento.Nombre,
+            Descripcion = evento.Descripcion,
+            FechaInicio = evento.FechaInicio,
+            FechaFin = evento.FechaFin,
+            Estado = EstadoEvento.Inactivo
+        };
+        return _eventoRepository.Add(nuevoEvento);
+    }
+    public int ActualizarEvento(int id, EventoUpdateDto evento)
+    {
+        var entidadEvento = new Evento
         {
-            var nuevoEvento = new Evento
-            {
-                Nombre = evento.Nombre,
-                Descripcion = evento.Descripcion,
-                FechaInicio = evento.FechaInicio,
-                FechaFin = evento.FechaFin,
-                Estado = EstadoEvento.Inactivo
-            };
-            return _eventoRepository.Add(nuevoEvento);
-        }
-            public int ActualizarEvento(int id, EventoUpdateDto evento)
-            {
-            var entidadEvento = new Evento
-            {
             IdEvento = id,
             Nombre = evento.Nombre,
             Descripcion = evento.Descripcion,
             FechaInicio = evento.FechaInicio,
             FechaFin = evento.FechaFin,
             Estado = evento.Estado
-            };
-    return _eventoRepository.Update(id, entidadEvento);
-}
+        };
+        return _eventoRepository.Update(entidadEvento);
+    }
 
-        public int EliminarEvento(int id)
-        {
-            return _eventoRepository.Delete(id);
-        }
+    public int EliminarEvento(int id)
+    {
+        return _eventoRepository.Delete(id);
+    }
 
-        public int Publicar(int id)
-        {
-            var evento = _eventoRepository.GetById(id);
-            if (evento == null) return 0;
+    public int Publicar(int id)
+    {
+        var evento = _eventoRepository.GetById(id);
+        if (evento == null) return 0;
 
-            evento.Estado = EstadoEvento.Publicado;
-            return _eventoRepository.Update(id, evento);
-        }
+        evento.Estado = EstadoEvento.Publicado;
+        return _eventoRepository.Update(evento);
+    }
 
-        public int Cancelar(int id)
-        {
-            var evento = _eventoRepository.GetById(id);
-            if (evento == null) return 0;
+    public int Cancelar(int id)
+    {
+        var evento = _eventoRepository.GetById(id);
+        if (evento == null) return 0;
 
-            evento.Estado = EstadoEvento.Cancelado;
-            return _eventoRepository.Update(id, evento);
-        }
+        evento.Estado = EstadoEvento.Cancelado;
+        return _eventoRepository.Update(evento);
     }
 }

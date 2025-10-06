@@ -1,62 +1,61 @@
 using sve.DTOs;
 using sve.Models;
-using sve.Repositories;
 using sve.Repositories.Contracts;
 using sve.Services.Contracts;
 
-namespace sve.Services
+namespace sve.Services;
+
+public class LocalService : ILocalService
 {
-    public class LocalService : ILocalService
+    private readonly ILocalRepository _localRepository;
+
+    public LocalService(ILocalRepository localRepository)
     {
-        private readonly ILocalRepository _localRepository;
+        _localRepository = localRepository;
+    }
 
-        public LocalService(ILocalRepository localRepository)
-        {
-            _localRepository = localRepository;
-        }
-
-        public List<LocalDto> ObtenerTodo()
+    public List<LocalDto> ObtenerTodo()
+    {
+        return _localRepository.GetAll()
+            .Select(local => new LocalDto
             {
-            return _localRepository.GetAll()
-                .Select(local => new LocalDto
-                {
-                    IdLocal = local.IdLocal,
-                    Nombre = local.Nombre,
-                    Direccion = local.Direccion,
-                    CapacidadTotal = local.CapacidadTotal
-                }).ToList();
-        }
-
-        public Local? ObtenerPorId(int id) 
-        {
-            return _localRepository.GetById(id);
-        }
-        public int AgregarLocal(LocalCreateDto local)
-        {
-            var nuevoLocal = new Local
-            {
+                IdLocal = local.IdLocal,
                 Nombre = local.Nombre,
                 Direccion = local.Direccion,
                 CapacidadTotal = local.CapacidadTotal
-            };
-            return _localRepository.Add(nuevoLocal);
-        }
+            }).ToList();
+    }
 
-        public int ActualizarLocal(int id, LocalUpdateDto local)
+    public Local? ObtenerPorId(int id)
+    {
+        return _localRepository.GetById(id);
+    }
+
+    public int AgregarLocal(LocalCreateDto local)
+    {
+        var nuevoLocal = new Local
         {
-            var entidad = new Local
-            {
-                IdLocal = id,
-                Nombre = local.Nombre,
-                Direccion = local.Direccion,
-                CapacidadTotal = local.CapacidadTotal
-            };
-            return _localRepository.Update(id, entidad);
-        }
+            Nombre = local.Nombre,
+            Direccion = local.Direccion,
+            CapacidadTotal = local.CapacidadTotal
+        };
+        return _localRepository.Add(nuevoLocal);
+    }
 
-        public int EliminarLocal(int id) 
-        {    
+    public int ActualizarLocal(int id, LocalUpdateDto local)
+    {
+        var entidad = new Local
+        {
+            IdLocal = id,
+            Nombre = local.Nombre,
+            Direccion = local.Direccion,
+            CapacidadTotal = local.CapacidadTotal
+        };
+        return _localRepository.Update(entidad);
+    }
+
+    public int EliminarLocal(int id)
+    {
         return _localRepository.Delete(id);
-        }
     }
 }

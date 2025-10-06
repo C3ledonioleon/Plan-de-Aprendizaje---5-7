@@ -78,13 +78,13 @@ namespace sve.Tests.Services
             var dto = new EntradaUpdateDto { Precio = 150, IdOrden = 2, IdTarifa = 2, Estado = EstadoEntrada.Activa };
 
             _mockRepo.Setup(r => r.GetById(1)).Returns(existente);
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Entrada>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Entrada>())).Returns(1);
 
             // Act
             var resultado = _service.ActualizarEntrada(1, dto);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Entrada>(e => e.Precio == 150 && e.IdOrden == 2)), Times.Once);
+            _mockRepo.Verify(r => r.Update(It.Is<Entrada>(e => e.Precio == 150 && e.IdOrden == 2)), Times.Once);
             Assert.Equal(1, resultado);
         }
 
@@ -94,14 +94,14 @@ namespace sve.Tests.Services
             // Arrange
             var entrada = new Entrada { IdEntrada = 1, Estado = EstadoEntrada.Activa };
             _mockRepo.Setup(r => r.GetById(1)).Returns(entrada);
-            _mockRepo.Setup(r => r.Update(1, It.IsAny<Entrada>())).Returns(1);
+            _mockRepo.Setup(r => r.Update(It.IsAny<Entrada>())).Returns(1);
 
             // Act
             var resultado = _service.AnularEntrada(1);
 
             // Assert
-            _mockRepo.Verify(r => r.Update(1, It.Is<Entrada>(e => e.Estado == EstadoEntrada.Anulada)), Times.Once);
-            Assert.Equal(1, resultado);
+            _mockRepo.Verify(r => r.Update(It.Is<Entrada>(e => e.Estado == EstadoEntrada.Anulada)), Times.Once);
+            Assert.Equal(true, resultado);
         }
 
         [Fact]

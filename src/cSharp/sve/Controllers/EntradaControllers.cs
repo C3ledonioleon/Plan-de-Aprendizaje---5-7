@@ -20,7 +20,6 @@ namespace sve.Controllers
             _entradaService = entradaService;
         }
 
-        // ===================== CRUD =====================
         [HttpGet]
         public ActionResult<List<EntradaDto>> ObtenerEntradas() => Ok(_entradaService.ObtenerTodo());
 
@@ -59,7 +58,6 @@ namespace sve.Controllers
             return eliminado == 0 ? NotFound($"No se encontró la entrada con ID {entradaId}") : NoContent();
         }
 
-        // ===================== QR =====================
         [HttpGet("{entradaId}/qr")]
         public IActionResult GenerarQR(int entradaId)
         {
@@ -77,9 +75,7 @@ namespace sve.Controllers
             if (entrada == null) return NotFound("noExiste");
             return Ok(new { qr = EncriptarId(entrada.IdEntrada) });
         }
-
         public class ValidarQrRequest { public string Qr { get; set; } }
-
         [HttpPost("validar")]
         public IActionResult ValidarQR([FromBody] ValidarQrRequest request)
         {
@@ -97,7 +93,6 @@ namespace sve.Controllers
                 _ => BadRequest("EstadoDesconocido")
             };
         }
-
         [HttpPost("{entradaId}/usar")]
         public IActionResult UsarQR(int entradaId)
         {
@@ -120,7 +115,6 @@ namespace sve.Controllers
             return Ok("Ok");
         }
 
-        // ===================== Métodos privados =====================
         private string EncriptarId(int id)
         {
             using var aes = Aes.Create();
@@ -146,7 +140,6 @@ namespace sve.Controllers
             }
             catch { return null; }
         }
-
         private byte[] GenerarQRBytes(string contenido)
         {
             using var qrGenerator = new QRCodeGenerator();

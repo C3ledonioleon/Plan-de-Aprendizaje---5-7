@@ -9,7 +9,7 @@ public static class StartupExtension
     {
         services.AddScoped<IClienteService, ClienteService>();
         services.AddScoped<IEntradaService, EntradaService>();
-        services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IUsuarioService, UsuarioService>(); 
         services.AddScoped<IEventoService, EventoService>();
         services.AddScoped<IFuncionService, FuncionService>();
         services.AddScoped<ILocalService, LocalService>();

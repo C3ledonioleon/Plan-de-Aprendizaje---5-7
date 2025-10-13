@@ -17,6 +17,7 @@ public class EntradasController : ControllerBase
     [HttpGet("{entradaId}/qr")]
     public IActionResult ObtenerQR(int entradaId)
     {
+        //se debe verificar que la orden de la entrada se encuentre pagada
         string contenidoQR = $"https://tusistema.com/entrada/{entradaId}";
         byte[] qrBytes = _qrService.GenerarQR(contenidoQR);
 

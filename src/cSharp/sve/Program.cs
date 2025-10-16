@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySql.Data.MySqlClient;
+using sve.DTOs;
+using sve.Models;
 using sve.Services;
+using sve.Services.Contracts;
 using System.Data;
 using System.Text;
 
@@ -90,3 +94,51 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+// === Cliente Controller =====
+
+var cliente = app.MapGroup("/api/clientes");
+
+
+cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente) =>
+
+{
+    var id = clienteService.AgregarCliente(cliente);
+    return Results.Created($"api/cliente/{id}",cliente);
+}
+
+);
+
+cliente.MapGet("/",(IClienteService clienteService ) =>
+{
+    var lista = clienteService.ObtenerTodo();
+    return Results.Ok(lista);
+});
+
+cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =>
+
+{
+    var cliente = clienteService.ObtenerPorId(clienteId);
+    if (cliente == null)
+        return Results.NotFound();
+    return Results.Ok (cliente);
+}
+);
+
+cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, int Id) =>
+{
+    var actualizado = clienteService.ActualizarCliente(Id, cliente);
+    if (actualizado == 0)
+
+        return Results.NotFound();
+
+    return Results.NoContent();
+});
+
+
+
+// === ENTRADA ====
+
+var entrada = app.MapGroup("/");
+

@@ -11,4 +11,4 @@ namespace sve.Services.Contracts;
         int AgregarCliente(ClienteCreateDto cliente);     // Antes: Add
         int ActualizarCliente(int id, ClienteUpdateDto cliente); // Antes: Update
         int EliminarCliente(int id);            // Antes: Delete
-    }
+}

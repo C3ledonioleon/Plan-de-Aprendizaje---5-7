@@ -13,7 +13,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
 builder.Services.AddServices();
 builder.Services.AddRepositories();
 
@@ -91,15 +90,14 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers();
 
-app.Run();
+
 
 
 // === Cliente Controller =====
 
 var cliente = app.MapGroup("/api/clientes");
-
+cliente.WithTags("Cliente "); // 👈 CORREGIDO: antes decía "clientes"
 
 cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente) =>
 
@@ -137,8 +135,38 @@ cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, i
 });
 
 
+// === Entradas Controller =====
+var entradas = app.MapGroup("/api/entradas");
+entradas.WithTags("Entradas");
 
-// === ENTRADA ====
+entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
+{
+    var id = entradaService.AgregarEntrada(entrada);
+    return Results.Created($"api/entrada/{id}", entrada);
+});
 
-var entrada = app.MapGroup("/");
+entradas.MapGet("/", (IEntradaService entradaService) =>
+{
+    var lista = entradaService.ObtenerTodo();
+    return Results.Ok(lista);
+});
 
+entradas.MapGet("/{entradaId}", (IEntradaService entradaService, int entradaId) =>
+{
+    var entrada = entradaService.ObtenerPorId(entradaId);
+    if (entrada == null)
+        return Results.NotFound();
+    return Results.Ok(entrada);
+});
+
+entradas.MapPut("/", (IEntradaService entradaService, EntradaUpdateDto entrada, int Id) =>
+{
+    var actualizado = entradaService.ActualizarEntrada(Id, entrada);
+    if (actualizado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
+
+
+
+app.Run();

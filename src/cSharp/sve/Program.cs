@@ -97,7 +97,7 @@ app.UseAuthorization();
 
 
 // === Cliente Controller =====
-#region 
+#region Cliente 
 var cliente = app.MapGroup("/api/clientes");
 cliente.WithTags("Cliente "); 
 
@@ -340,23 +340,23 @@ local.MapDelete("/", (int localId, ILocalService localService) =>
 
 #region Orden
 
-var Orden = app.MapGroup("api/Ordenes");
-Orden.WithTags("Orden");
+var orden = app.MapGroup("api/ordenes");
+orden.WithTags("Orden");
 
-Orden.MapPost("/api/ordenes", (OrdenCreateDto orden, IOrdenService ordenService) =>
+orden.MapPost("/api/ordenes", (OrdenCreateDto orden, IOrdenService ordenService) =>
 {
     var ordenId = ordenService.AgregarOrden(orden);
     return Results.Ok(new { IdOrden = ordenId });
 });
 
-Orden.MapGet("/",(IOrdenService ordenService)=>
+orden.MapGet("api/orden",(IOrdenService ordenService)=>
 
 {
     var ordenes = ordenService.ObtenerTodo();
     return Results.Ok(ordenes);
 });
 
-Orden.MapGet("/", (int ordenId, IOrdenService ordenService) =>
+orden.MapGet("api/", (int ordenId, IOrdenService ordenService) =>
 {
     var orden = ordenService.ObtenerPorId(ordenId);
     if (orden == null)
@@ -364,7 +364,7 @@ Orden.MapGet("/", (int ordenId, IOrdenService ordenService) =>
     return Results.Ok(orden);
 });
 
-Orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
+orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
 {
     var result = ordenService.PagarOrden(ordenId);
 
@@ -375,7 +375,18 @@ Orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenServic
 });
 
 
+orden.MapPost ("/",(int ordenId, IOrdenService ordenService )=>
 
+{
+     var result = ordenService.CancelarOrden(ordenId);
+
+    if (!result)
+        return Results.BadRequest("No se pudo cancelar la orden (puede que ya esté pagada o no exista.");
+
+    return Results.Ok(new { mesaje = "Orden cancelada" });
+}
+
+);
 
 #endregion
 

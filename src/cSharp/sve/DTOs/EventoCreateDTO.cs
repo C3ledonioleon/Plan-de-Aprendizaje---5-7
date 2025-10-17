@@ -4,8 +4,8 @@ namespace sve.DTOs
 {
     public class EventoCreateDto
     {
-        public required string Nombre { get; set; } 
-        public required string Descripcion { get; set; }
+        public string Nombre { get; set; } 
+        public string Descripcion { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public EstadoEvento Estado { get; set; }

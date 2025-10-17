@@ -19,9 +19,9 @@ namespace sve.DTOs
     public class ClienteDto
     {
         public int IdCliente { get; set; }
-        public required string DNI { get; set; }
-        public required string Nombre { get; set; }
-        public required string Telefono { get; set; }
+        public string DNI { get; set; }
+        public string Nombre { get; set; }
+        public  string Telefono { get; set; }
         public int IdUsuario { get; set; }
 
 

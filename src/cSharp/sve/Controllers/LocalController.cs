@@ -24,7 +24,8 @@ namespace sve.Controllers
         }
 
         [HttpGet]
-        public IActionResult ObtenerLocales() => Ok(_localService.ObtenerTodo());
+        public IActionResult ObtenerLocales() =>
+        Ok(_localService.ObtenerTodo());
 
         [HttpGet("{idLocal}")]
         public IActionResult ObtenerLocal(int idLocal)

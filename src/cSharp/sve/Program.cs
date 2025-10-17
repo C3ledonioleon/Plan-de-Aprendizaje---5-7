@@ -1,5 +1,7 @@
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -97,13 +99,13 @@ app.UseAuthorization();
 // === Cliente Controller =====
 #region 
 var cliente = app.MapGroup("/api/clientes");
-cliente.WithTags("Cliente "); // 👈 CORREGIDO: antes decía "clientes"
+cliente.WithTags("Cliente "); 
 
 cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente) =>
 
 {
     var id = clienteService.AgregarCliente(cliente);
-    return Results.Created($"api/cliente/{id}",cliente);
+    return Results.Created($"/api/clientes/{id}",cliente);
 }
 
 );
@@ -123,8 +125,7 @@ cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =
     return Results.Ok (cliente);
 }
 );
-
-cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, int Id) =>
+cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto cliente, int Id) =>
 {
     var actualizado = clienteService.ActualizarCliente(Id, cliente);
     if (actualizado == 0)
@@ -133,6 +134,7 @@ cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, i
 
     return Results.NoContent();
 });
+
 #endregion
 
 // === Entradas Controller =====
@@ -162,7 +164,7 @@ entradas.MapGet("/{entradaId}", (IEntradaService entradaService, int entradaId) 
     return Results.Ok(entrada);
 });
 
-entradas.MapPut("/", (IEntradaService entradaService, EntradaUpdateDto entrada, int Id) =>
+entradas.MapPut("/{entradaId}", (IEntradaService entradaService, EntradaUpdateDto entrada, int Id) =>
 {
     var actualizado = entradaService.ActualizarEntrada(Id, entrada);
     if (actualizado == 0)
@@ -243,62 +245,139 @@ evento.MapPost ("/{eventoId}/cancelar", (int id , IEventoService eventoService) 
 #endregion 
 
 #region Funcion
-var funcion = app.MapGroup ("/")
+var funcion = app.MapGroup("/api/funciones");
 
-funcion.MapPost("/",(IFuncionService funcionService , FuncionCreateDto funcion) =>
+funcion.WithTags("Funcion");
+
+funcion.MapPost("/", (IFuncionService funcionService, FuncionCreateDto funcion) =>
 {
-    var funcion = clienteService.AgregarFuncion (funcion);
-    return Created($"/")
+    var id = funcionService.AgregarFuncion(funcion);
+    return Results.Created($"/api/funciones/{id}", funcion);
 });
 
-funcion.MapGet ("/",( ) =>
-
+funcion.MapGet("/", (IFuncionService funcionService) =>
 {
-    var funciones = funcionService.ObtenerTodo ();
-    if (funcion == null) 
+    var funciones = funcionService.ObtenerTodo();
+    if (funciones == null)
         return Results.NotFound();
-        return Results.Ok(funciones);
-}); 
-
-funcion.MapGet ("/",(IFuncionService funcionService , int funcionId) =>
-
-{
-    var funcion = funcionService.ObtenerPorId (funcionId);
-    if (funcion == null ) 
-        return Results.NotFound ();
-    return Results.Ok(funcion); 
+    return Results.Ok(funciones);
 });
 
-funcion.MapPut("/"(IFuncionService funcionService, int funcionId)=>
-
+funcion.MapGet("/{funcionId}", (int funcionId, IFuncionService funcionService) =>
 {
-    var actualizado = funcionService.ActualizarFuncion(actualizado);
-    if ( actualizado == 0 )return Results.NotFound();
+    var funcionEncontrada = funcionService.ObtenerPorId(funcionId);
+    if (funcionEncontrada == null)
+        return Results.NotFound();
+    return Results.Ok(funcionEncontrada);
+});
+
+funcion.MapPut("/{funcionId}", (int funcionId, IFuncionService funcionService, FuncionUpdateDto funcion) =>
+{
+    var actualizado = funcionService.ActualizarFuncion(funcionId, funcion);
+    if (actualizado == 0)
+        return Results.NotFound();
     return Results.NoContent();
 });
 
+funcion.MapDelete("/{funcionId}", (int funcionId, IFuncionService funcionService) =>
+{
+    var eliminado = funcionService.EliminarFuncion(funcionId);
+    if (eliminado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
 
-funcion.MapDelete ("{funcionId}",(IFuncionService funcionService, int funcionId) =>
+funcion.MapPost("/{funcionId}/cancelar", (int funcionId, IFuncionService funcionService) =>
+{
+    var actualizado = funcionService.CancelarFuncion(funcionId);
+    if (actualizado == 0)
+        return Results.NotFound();
+    return Results.Ok(new { mensaje = "Función cancelada correctamente" });
+});
+#endregion
+
+#region Local
+
+var local = app.MapGroup("api/locales");
+local.WithTags("Local");
+
+local.MapPost("/", (ILocalService localService, LocalCreateDto local) =>
+{
+    var id = localService.AgregarLocal(local);
+    return Results.Created($"/api/local/{id}", local);
+});
+
+local.MapGet("/", (ILocalService localService) =>
+{
+    var local = localService.ObtenerTodo();
+    return Results.Ok(local);
+});
+
+local.MapGet("/", (int localId, ILocalService localService) =>
+{
+    var id = localService.ObtenerPorId(localId);
+    if (local == null)
+        return Results.NotFound();
+    return Results.Ok(local);
+});
+
+local.MapPut("/", (int localId, ILocalService localService, LocalUpdateDto local) =>
+{
+    var actualizado = localService.ActualizarLocal(localId, local);
+    if (actualizado == 0) return Results.NotFound();
+    return Results.NoContent();
+});
+
+local.MapDelete("/", (int localId, ILocalService localService) =>
 
 {
-    var eliminado = funcionService.EliminarFuncion (funcionId);
-    if(eliminado == 0 ) return NotFound();
-    return NoContent ();
-}
+    var eliminado = localService.EliminarLocal(localId);
+    if (eliminado == 0) return Results.NotFound();
+    return Results.NoContent();
+});
+#endregion
 
-);
 
-funcion.MapPost ("{funcionId}/cancelar",( int funcionId, IFuncionService funcionService ) =>
+#region Orden
+
+var Orden = app.MapGroup("api/Ordenes");
+Orden.WithTags("Orden");
+
+Orden.MapPost("/api/ordenes", (OrdenCreateDto orden, IOrdenService ordenService) =>
+{
+    var ordenId = ordenService.AgregarOrden(orden);
+    return Results.Ok(new { IdOrden = ordenId });
+});
+
+Orden.MapGet("/",(IOrdenService ordenService)=>
 
 {
-    var actualizado = funcionService.CancelarFuncion (funcionId); 
-    if(actualizado == 0 ) 
-    return Results.NotFound();
+    var ordenes = ordenService.ObtenerTodo();
+    return Results.Ok(ordenes);
+});
 
-    return Results.Ok(new{mensaje = "Función cancelada correctamente"})
-}
-)
+Orden.MapGet("/", (int ordenId, IOrdenService ordenService) =>
+{
+    var orden = ordenService.ObtenerPorId(ordenId);
+    if (orden == null)
+        return Results.NotFound();
+    return Results.Ok(orden);
+});
+
+Orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
+{
+    var result = ordenService.PagarOrden(ordenId);
+
+    if (!result)
+        return Results.BadRequest("No se pudo procesar el pago o la orden no existe.");
+
+    return Results.Ok(new { mesaje = "Orden pagada y entradas emitidas" });
+});
+
+
+
 
 #endregion
+
 
 app.Run();

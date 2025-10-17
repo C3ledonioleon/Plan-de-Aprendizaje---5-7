@@ -10,8 +10,6 @@ namespace sve.Models
         public EstadoEvento Estado { get; set; }
         public List<Funcion>? Funciones { get; set; }
         
-        public Evento()
-        { }
     }
     public enum EstadoEvento
     {

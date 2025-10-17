@@ -44,7 +44,7 @@ public class ClienteRepository : IClienteRepository
         SET Nombre = @Nombre,
             DNI = @DNI,
             Telefono = @Telefono,
-            IdUsuario = @IdUsuario,
+            IdUsuario = @IdUsuario
         WHERE IdCliente = @IdCliente";
         int rows = _connection.Execute(sql, cliente );
         return rows > 0 ? cliente.IdCliente : 0;

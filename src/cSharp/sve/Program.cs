@@ -139,6 +139,7 @@ cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, i
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
 
+
 entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
 {
     var id = entradaService.AgregarEntrada(entrada);
@@ -167,6 +168,77 @@ entradas.MapPut("/", (IEntradaService entradaService, EntradaUpdateDto entrada, 
     return Results.NoContent();
 });
 
+// === EventoController === 
 
+#region Evento
+var evento = app.MapGroup ("/api/eventos");
+
+evento.WithTags("Evento");
+
+
+evento.MapPost("/",(IEventoService eventoService, EventoCreateDto evento ) =>
+
+{
+    var id = eventoService.AgregarEvento(evento);
+    return Results.Created($"/api/evento{id}", evento);
+} );
+
+evento.MapGet ("/",(IEventoService eventoService )=>
+
+{
+    var evento = eventoService.ObtenerTodo();
+    return Results.Ok(evento);
+} );
+
+evento.MapGet ("/{eventoId}",(int eventoId ,IEventoService eventoService) =>
+
+{
+  var evento = eventoService.ObtenerPorId(eventoId);
+  if (evento == null ) return Results.NotFound();
+   return Results.Ok (evento);
+}
+);
+
+evento.MapPut("/{eventoId}",( int eventoId, IEventoService eventoService , EventoUpdateDto evento ) => 
+{
+    var actualizado = eventoService.ActualizarEvento (eventoId, evento);
+    if (actualizado == 0 ) 
+        return Results.NotFound ();
+
+    return Results.NoContent ();
+} );
+
+evento.MapDelete("/{eventoId}",(int eventoId ,IEventoService eventoService ) =>
+
+
+{
+    var eliminado = eventoService.EliminarEvento (eventoId);
+    if (eliminado == 0 ) 
+        return Results.NotFound() ;
+
+    return Results.NoContent ();
+});
+
+evento.MapPost("/{eventoId}/publicar",(int id, IEventoService eventoService) => 
+
+{
+    var publicado = eventoService.Publicar(id);
+    if(publicado == 0 ) 
+     return Results.NotFound();
+
+    return Results.Ok (new {mensaje = "Evento publicado correctamente"});
+});
+
+
+evento.MapPost ("/{eventoId}/cancelar", (int id , IEventoService eventoService) =>
+
+{   
+    var cancelado = eventoService.Cancelar ( id);
+    if (cancelado == 0 ) 
+    return Results.NotFound();
+    
+    return Results.Ok(new { mensaje = "Evento cancelado correctamente"});
+});
+#endregion 
 
 app.Run();

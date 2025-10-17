@@ -95,7 +95,7 @@ app.UseAuthorization();
 
 
 // === Cliente Controller =====
-
+#region 
 var cliente = app.MapGroup("/api/clientes");
 cliente.WithTags("Cliente "); // 👈 CORREGIDO: antes decía "clientes"
 
@@ -133,9 +133,11 @@ cliente.MapPut("/", (IClienteService clienteService, ClienteUpdateDto cliente, i
 
     return Results.NoContent();
 });
-
+#endregion
 
 // === Entradas Controller =====
+
+#region Entrada
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
 
@@ -167,9 +169,8 @@ entradas.MapPut("/", (IEntradaService entradaService, EntradaUpdateDto entrada, 
         return Results.NotFound();
     return Results.NoContent();
 });
-
+#endregion 
 // === EventoController === 
-
 #region Evento
 var evento = app.MapGroup ("/api/eventos");
 
@@ -240,5 +241,64 @@ evento.MapPost ("/{eventoId}/cancelar", (int id , IEventoService eventoService) 
     return Results.Ok(new { mensaje = "Evento cancelado correctamente"});
 });
 #endregion 
+
+#region Funcion
+var funcion = app.MapGroup ("/")
+
+funcion.MapPost("/",(IFuncionService funcionService , FuncionCreateDto funcion) =>
+{
+    var funcion = clienteService.AgregarFuncion (funcion);
+    return Created($"/")
+});
+
+funcion.MapGet ("/",( ) =>
+
+{
+    var funciones = funcionService.ObtenerTodo ();
+    if (funcion == null) 
+        return Results.NotFound();
+        return Results.Ok(funciones);
+}); 
+
+funcion.MapGet ("/",(IFuncionService funcionService , int funcionId) =>
+
+{
+    var funcion = funcionService.ObtenerPorId (funcionId);
+    if (funcion == null ) 
+        return Results.NotFound ();
+    return Results.Ok(funcion); 
+});
+
+funcion.MapPut("/"(IFuncionService funcionService, int funcionId)=>
+
+{
+    var actualizado = funcionService.ActualizarFuncion(actualizado);
+    if ( actualizado == 0 )return Results.NotFound();
+    return Results.NoContent();
+});
+
+
+funcion.MapDelete ("{funcionId}",(IFuncionService funcionService, int funcionId) =>
+
+{
+    var eliminado = funcionService.EliminarFuncion (funcionId);
+    if(eliminado == 0 ) return NotFound();
+    return NoContent ();
+}
+
+);
+
+funcion.MapPost ("{funcionId}/cancelar",( int funcionId, IFuncionService funcionService ) =>
+
+{
+    var actualizado = funcionService.CancelarFuncion (funcionId); 
+    if(actualizado == 0 ) 
+    return Results.NotFound();
+
+    return Results.Ok(new{mensaje = "Función cancelada correctamente"})
+}
+)
+
+#endregion
 
 app.Run();

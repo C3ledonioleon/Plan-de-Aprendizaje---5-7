@@ -1,22 +1,24 @@
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using sve.DTOs;
 using sve.Models;
 using sve.Services;
 using sve.Services.Contracts;
 using System.Data;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddServices();
 builder.Services.AddRepositories();
+
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -96,6 +98,7 @@ app.UseAuthorization();
 
 
 
+
 // === Cliente Controller =====
 #region Cliente 
 var cliente = app.MapGroup("/api/clientes");
@@ -136,9 +139,6 @@ cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto
 });
 
 #endregion
-
-// === Entradas Controller =====
-
 #region Entrada
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
@@ -313,7 +313,7 @@ local.MapGet("/", (ILocalService localService) =>
     return Results.Ok(local);
 });
 
-local.MapGet("/", (int localId, ILocalService localService) =>
+local.MapGet("/{id:int}", (int localId, ILocalService localService) =>
 {
     var id = localService.ObtenerPorId(localId);
     if (local == null)
@@ -321,14 +321,14 @@ local.MapGet("/", (int localId, ILocalService localService) =>
     return Results.Ok(local);
 });
 
-local.MapPut("/", (int localId, ILocalService localService, LocalUpdateDto local) =>
+local.MapPut("/{id:int}", (int localId, ILocalService localService, LocalUpdateDto local) =>
 {
     var actualizado = localService.ActualizarLocal(localId, local);
     if (actualizado == 0) return Results.NotFound();
     return Results.NoContent();
 });
 
-local.MapDelete("/", (int localId, ILocalService localService) =>
+local.MapDelete("/{id:int}", (int localId, ILocalService localService) =>
 
 {
     var eliminado = localService.EliminarLocal(localId);
@@ -343,20 +343,20 @@ local.MapDelete("/", (int localId, ILocalService localService) =>
 var orden = app.MapGroup("api/ordenes");
 orden.WithTags("Orden");
 
-orden.MapPost("/api/ordenes", (OrdenCreateDto orden, IOrdenService ordenService) =>
+orden.MapPost("/", (OrdenCreateDto orden, IOrdenService ordenService) =>
 {
     var ordenId = ordenService.AgregarOrden(orden);
     return Results.Ok(new { IdOrden = ordenId });
 });
 
-orden.MapGet("api/orden",(IOrdenService ordenService)=>
+orden.MapGet("/",(IOrdenService ordenService)=>
 
 {
     var ordenes = ordenService.ObtenerTodo();
     return Results.Ok(ordenes);
 });
 
-orden.MapGet("api/", (int ordenId, IOrdenService ordenService) =>
+orden.MapGet("/{id:int}", (int ordenId, IOrdenService ordenService) =>
 {
     var orden = ordenService.ObtenerPorId(ordenId);
     if (orden == null)
@@ -364,7 +364,7 @@ orden.MapGet("api/", (int ordenId, IOrdenService ordenService) =>
     return Results.Ok(orden);
 });
 
-orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
+orden.MapPost("/{id:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
 {
     var result = ordenService.PagarOrden(ordenId);
 
@@ -375,7 +375,7 @@ orden.MapPost("api/{ordenId:int}/pagar", (int ordenId ,IOrdenService ordenServic
 });
 
 
-orden.MapPost ("/",(int ordenId, IOrdenService ordenService )=>
+orden.MapPost ("/{id:int}/cancelar",(int ordenId, IOrdenService ordenService )=>
 
 {
      var result = ordenService.CancelarOrden(ordenId);
@@ -390,5 +390,172 @@ orden.MapPost ("/",(int ordenId, IOrdenService ordenService )=>
 
 #endregion
 
+#region Sector
+var sector = app.MapGroup("/api/sectores");
+sector.WithTags("Sector");
+
+sector.MapPost("/", (ISectorService sectorService, SectorCreateDto sector) =>
+{
+    var id = sectorService.AgregarSector(sector);
+    return Results.Created($"/api/sectores/{id}", sector);
+});
+
+sector.MapGet("/", (ISectorService sectorService) =>
+{
+    var sectores = sectorService.ObtenerTodo();
+    return Results.Ok(sectores);
+});
+
+sector.MapGet("/{id:int}", (int sectorId, ISectorService sectorService) =>
+{
+    var sector = sectorService.ObtenerPorId(sectorId);
+    if (sector == null)
+        return Results.NotFound();
+    return Results.Ok(sector);
+});
+
+sector.MapPut("/{id:int}", (int sectorId, ISectorService sectorService, SectorUpdateDto sector) =>
+{
+    var actualizado = sectorService.ActualizarSector(sectorId, sector);
+    if (actualizado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
+
+sector.MapDelete("/{id:int}", (int sectorId, ISectorService sectorService) =>
+{
+    var eliminado = sectorService.EliminarSector(sectorId);
+    if (eliminado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
+
+#endregion
+
+#region Tarifa
+var tarifa = app.MapGroup("/api/tarifas");
+tarifa.WithTags("Tarifa");
+
+tarifa.MapPost("/", (ITarifaService tarifaService, TarifaCreateDto tarifa) =>
+{
+    var id = tarifaService.AgregarTarifa(tarifa);
+    return Results.Created($"/api/tarifas/{id}", tarifa);
+});
+
+tarifa.MapGet("/", (ITarifaService tarifaService) =>
+{
+    var tarifas = tarifaService.ObtenerTodo();
+    return Results.Ok(tarifas);
+});
+
+tarifa.MapGet("/{id:int}", (int tarifaId, ITarifaService tarifaService) =>
+{
+    var tarifa = tarifaService.ObtenerPorId(tarifaId);
+    if (tarifa == null)
+        return Results.NotFound();
+    return Results.Ok(tarifa);
+});
+
+tarifa.MapPut("/{id:int}", (int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
+{
+    var actualizado = tarifaService.ActualizarTarifa(tarifaId, tarifa);
+    if (actualizado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
+
+
+tarifa.MapDelete("/{id:int}", (int tarifaId, ITarifaService tarifaService) =>
+{
+    var eliminado = tarifaService.EliminarTarifa(tarifaId);
+    if (eliminado == 0)
+        return Results.NotFound();
+    return Results.NoContent();
+});
+
+#endregion
+
+
+#region Usuario
+var auth = app.MapGroup("/api/Auth");
+auth.WithTags("Auth");
+
+auth.MapPost("Register", (IUsuarioService usuarioService, RegisterDto usuario) =>
+{
+    var id = usuarioService.Register(usuario);
+    return Results.Created($"/api/usuarios/{id}", usuario);
+});
+
+
+auth.MapPost("Login", (IUsuarioService usuarioService, LoginDto usuario) =>
+{
+    var tokens = usuarioService.Login(usuario);
+    return Results.Ok(tokens);
+});
+
+
+auth.MapPost("Refresh", (IUsuarioService usuarioService, [FromBody] string refreshToken) =>
+{
+    try
+    {
+        var tokens = usuarioService.Refresh(refreshToken);
+        return Results.Ok(tokens);
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(
+            new { error = ex.Message }
+        );
+}
+});
+
+
+auth.MapPost("Logout", [Authorize] (IUsuarioService usuarioService, HttpContext httpContext) =>
+{
+    var email = httpContext.User.FindFirstValue(ClaimTypes.Email);
+    if (email != null)
+    {
+        usuarioService.Logout(email);
+        return Results.Ok(new { message = "Sesión cerrada correctamente." });
+    }
+    return Results.Unauthorized();
+});
+
+auth.MapGet("/me", [Authorize] (HttpContext http ) =>
+{
+    var email = http.User.FindFirstValue(ClaimTypes.Email);
+    var rol = http.User.FindFirstValue(ClaimTypes.Role);
+
+    if (string.IsNullOrEmpty(email))
+        return Results.Unauthorized();
+
+    return Results.Ok(new { email, rol });
+});
+
+auth.MapGet("Roles", (IUsuarioService usuarioService) =>
+{
+    var roles = Enum.GetNames(typeof(RolUsuario));
+    return Results.Ok(roles);
+});
+
+
+auth.MapPost("/{usuarioId}/rol", [Authorize(Roles = "Administrador")] (int usuarioId, [FromBody] RolUsuario nuevoRol, IUsuarioService usuarioService) =>
+{
+    try
+    {
+        var usuario = usuarioService.GetById(usuarioId);
+        if (usuario == null)
+            return Results.NotFound(new { error = "Usuario no encontrado." });
+
+        usuarioService.UpdateRol(usuarioId, nuevoRol);
+
+        return Results.Ok(new { message = $"Rol asignado: {nuevoRol}" });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+#endregion
 
 app.Run();

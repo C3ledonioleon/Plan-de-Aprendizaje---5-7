@@ -4,9 +4,11 @@ namespace sve.DTOs;
 
 public class RegisterDto
 {
+
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Contraseña { get; set; } = null!;
+    public RolUsuario? Rol {get; set; } 
 }
 
 public class LoginDto

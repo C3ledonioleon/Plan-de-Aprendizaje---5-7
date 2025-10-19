@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet()]
-    public IActionResult Me()
+    public IActionResult Me( )
     {
         var email = User.FindFirstValue(ClaimTypes.Email);
         var rol = User.FindFirstValue(ClaimTypes.Role);

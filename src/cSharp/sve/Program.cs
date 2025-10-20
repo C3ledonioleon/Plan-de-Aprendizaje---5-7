@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using sve.DTOs;
 using sve.Models;
 using sve.Services;
@@ -17,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddServices();
 builder.Services.AddRepositories();
-
+builder.Services.AddScoped<IQRService, QRService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -98,7 +97,6 @@ app.UseAuthorization();
 
 
 
-
 // === Cliente Controller =====
 #region Cliente 
 var cliente = app.MapGroup("/api/clientes");
@@ -139,10 +137,10 @@ cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto
 });
 
 #endregion
+
 #region Entrada
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
-
 
 entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
 {
@@ -164,14 +162,28 @@ entradas.MapGet("/{entradaId}", (IEntradaService entradaService, int entradaId) 
     return Results.Ok(entrada);
 });
 
-entradas.MapPut("/{entradaId}", (IEntradaService entradaService, EntradaUpdateDto entrada, int Id) =>
+entradas.MapPost("{entradaId}/anular", (IEntradaService entradaService, int entradaId) =>
 {
-    var actualizado = entradaService.ActualizarEntrada(Id, entrada);
-    if (actualizado == 0)
-        return Results.NotFound();
-    return Results.NoContent();
+    return !entradaService.AnularEntrada(entradaId)
+    ? Results.NotFound($"No se encontro la entrada con ID{entradaId}") :
+    Results.Ok($"La entrada con ID{entradaId} fue anulada corectamente");
 });
-#endregion 
+
+// ==== QR ==== 
+
+
+entradas.MapGet("/{entradaId}/qr", ([FromRoute] int entradaId, [FromServices] IQRService qrService) =>
+{
+    var contenido = $"Entrada {entradaId} - Sistema de Venta de Entradas";
+    var qrBytes = qrService.GenerarQR(contenido);
+    return Results.File(qrBytes, "image/png");
+});
+
+
+
+#endregion
+
+
 // === EventoController === 
 #region Evento
 var evento = app.MapGroup ("/api/eventos");

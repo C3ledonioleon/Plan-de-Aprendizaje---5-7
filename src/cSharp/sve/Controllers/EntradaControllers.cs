@@ -58,6 +58,11 @@ namespace sve.Controllers
             return eliminado == 0 ? NotFound($"No se encontró la entrada con ID {entradaId}") : NoContent();
         }
 
+        // ==== QR === 
+        
+
+
+
         [HttpGet("{entradaId}/qr")]
         public IActionResult GenerarQR(int entradaId)
         {

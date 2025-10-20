@@ -17,8 +17,6 @@ public static class StartupExtension
         services.AddScoped<ISectorService, SectorService>();
         services.AddScoped<ITarifaService, TarifaService>();
         services.AddScoped<IUsuarioService, UsuarioService>();
-
-        
         return services;
     }
     

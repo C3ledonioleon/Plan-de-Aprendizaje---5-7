@@ -1,5 +1,7 @@
 using QRCoder;
+using sve.Models;
 using sve.Services.Contracts;
+
 
 namespace sve.Services;
 

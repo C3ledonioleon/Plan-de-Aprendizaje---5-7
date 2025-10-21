@@ -46,7 +46,7 @@ public class FuncionRepository : IFuncionRepository
                 SET FechaHora = @FechaHora,
                     IdLocal = @IdLocal,
                     IdEvento = @IdEvento,
-                    Estado = @Estado,
+                    Estado = @Estado
                 WHERE IdFuncion = @IdFuncion";
 
         int rows = _connection.Execute(sql, funcion );

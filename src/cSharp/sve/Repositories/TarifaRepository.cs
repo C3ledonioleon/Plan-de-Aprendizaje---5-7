@@ -30,8 +30,8 @@ public class TarifaRepository : ITarifaRepository
     public int Add(Tarifa tarifa)
     {
         string sql = @"
-                INSERT INTO Tarifa (Precio, Stock, IdSector, IdFuncion)
-                VALUES (@Precio, @Stock, @IdSector, @IdFuncion);
+                INSERT INTO Tarifa (Precio, Stock, IdSector, IdFuncion, Estado)
+                VALUES (@Precio, @Stock, @IdSector, @IdFuncion, @Estado);
                 SELECT LAST_INSERT_ID();";
         int newId = _connection.ExecuteScalar<int>(sql, tarifa);
         tarifa.IdTarifa = newId;
@@ -45,7 +45,8 @@ public class TarifaRepository : ITarifaRepository
                 SET Precio = @Precio,
                     Stock = @Stock,
                     IdSector = @IdSector,
-                    IdFuncion = @IdFuncion
+                    IdFuncion = @IdFuncion,
+                    Estado = @Estado
                 WHERE IdTarifa = @IdTarifa";
         int rows = _connection.Execute(sql, tarifa);
         return rows > 0 ? tarifa.IdTarifa: 0; 

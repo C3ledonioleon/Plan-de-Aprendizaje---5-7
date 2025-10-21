@@ -369,7 +369,7 @@ orden.MapGet("/",(IOrdenService ordenService)=>
     return Results.Ok(ordenes);
 });
 
-orden.MapGet("/{id:int}", (int ordenId, IOrdenService ordenService) =>
+orden.MapGet("/{ordenId}", (int ordenId, IOrdenService ordenService) =>
 {
     var orden = ordenService.ObtenerPorId(ordenId);
     if (orden == null)
@@ -377,7 +377,7 @@ orden.MapGet("/{id:int}", (int ordenId, IOrdenService ordenService) =>
     return Results.Ok(orden);
 });
 
-orden.MapPost("/{id:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
+orden.MapPost("/{ordenId}/pagar", (int ordenId ,IOrdenService ordenService) =>
 {
     var result = ordenService.PagarOrden(ordenId);
 
@@ -388,7 +388,7 @@ orden.MapPost("/{id:int}/pagar", (int ordenId ,IOrdenService ordenService) =>
 });
 
 
-orden.MapPost ("/{id:int}/cancelar",(int ordenId, IOrdenService ordenService )=>
+orden.MapPost ("/{ordenId}/cancelar",(int ordenId, IOrdenService ordenService )=>
 
 {
      var result = ordenService.CancelarOrden(ordenId);
@@ -419,7 +419,7 @@ sector.MapGet("/", (ISectorService sectorService) =>
     return Results.Ok(sectores);
 });
 
-sector.MapGet("/{id:int}", (int sectorId, ISectorService sectorService) =>
+sector.MapGet("/{sectorId}", (int sectorId,ISectorService sectorService) =>
 {
     var sector = sectorService.ObtenerPorId(sectorId);
     if (sector == null)
@@ -427,7 +427,7 @@ sector.MapGet("/{id:int}", (int sectorId, ISectorService sectorService) =>
     return Results.Ok(sector);
 });
 
-sector.MapPut("/{id:int}", (int sectorId, ISectorService sectorService, SectorUpdateDto sector) =>
+sector.MapPut("/{sectorId}", (int sectorId, ISectorService sectorService, SectorUpdateDto sector) =>
 {
     var actualizado = sectorService.ActualizarSector(sectorId, sector);
     if (actualizado == 0)
@@ -435,7 +435,7 @@ sector.MapPut("/{id:int}", (int sectorId, ISectorService sectorService, SectorUp
     return Results.NoContent();
 });
 
-sector.MapDelete("/{id:int}", (int sectorId, ISectorService sectorService) =>
+sector.MapDelete("/{sectorId}", (int sectorId, ISectorService sectorService) =>
 {
     var eliminado = sectorService.EliminarSector(sectorId);
     if (eliminado == 0)
@@ -461,7 +461,7 @@ tarifa.MapGet("/", (ITarifaService tarifaService) =>
     return Results.Ok(tarifas);
 });
 
-tarifa.MapGet("/{id:int}", (int tarifaId, ITarifaService tarifaService) =>
+tarifa.MapGet("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 {
     var tarifa = tarifaService.ObtenerPorId(tarifaId);
     if (tarifa == null)
@@ -469,7 +469,7 @@ tarifa.MapGet("/{id:int}", (int tarifaId, ITarifaService tarifaService) =>
     return Results.Ok(tarifa);
 });
 
-tarifa.MapPut("/{id:int}", (int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
+tarifa.MapPut("/{tarifaId}", ( int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
 {
     var actualizado = tarifaService.ActualizarTarifa(tarifaId, tarifa);
     if (actualizado == 0)
@@ -478,7 +478,7 @@ tarifa.MapPut("/{id:int}", (int tarifaId, ITarifaService tarifaService, TarifaUp
 });
 
 
-tarifa.MapDelete("/{id:int}", (int tarifaId, ITarifaService tarifaService) =>
+tarifa.MapDelete("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 {
     var eliminado = tarifaService.EliminarTarifa(tarifaId);
     if (eliminado == 0)

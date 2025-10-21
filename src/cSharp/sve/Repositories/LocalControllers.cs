@@ -45,7 +45,7 @@ public class LocalRepository : ILocalRepository
                 UPDATE Local 
                 SET Nombre = @Nombre,
                     Direccion = @Direccion, 
-                    CapacidadTotal = @CapacidadTotal,
+                    CapacidadTotal = @CapacidadTotal
                 WHERE IdLocal = @IdLocal";
         int rows = _connection.Execute(sql, local);
         return rows > 0 ? local.IdLocal : 0;

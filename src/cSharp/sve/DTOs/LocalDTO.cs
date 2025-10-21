@@ -9,7 +9,7 @@ public class LocalCreateDto
 
 public class LocalUpdateDto : LocalCreateDto
 {
-    
+
 }
 
 public class LocalDto

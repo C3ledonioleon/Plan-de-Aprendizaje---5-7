@@ -45,7 +45,7 @@ public class SectorRepository : ISectorRepository
                 UPDATE Sector 
                 SET Nombre = @Nombre,
                 Capacidad = @Capacidad,
-                IdLocal = @IdLocal,
+                IdLocal = @IdLocal
                 WHERE IdSector = @IdSector";
         int rows = _connection.Execute(sql, sector);
         return rows > 0 ? sector.IdSector : 0; 

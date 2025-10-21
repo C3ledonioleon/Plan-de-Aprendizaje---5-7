@@ -51,7 +51,7 @@ public class UsuarioRepository : IUsuarioRepository
         SET Username = @Username,
             Email = @Email,
             Password = @Password,
-            Rol = @Rol,
+            Rol = @Rol
         WHERE IdUsuario = @IdUsuario";
         int rows = _connection.Execute(sql, usuario);
         return rows > 0 ? usuario.IdUsuario : 0;

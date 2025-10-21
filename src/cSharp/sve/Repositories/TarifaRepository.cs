@@ -45,7 +45,7 @@ public class TarifaRepository : ITarifaRepository
                 SET Precio = @Precio,
                     Stock = @Stock,
                     IdSector = @IdSector,
-                    IdFuncion = @IdFuncion,
+                    IdFuncion = @IdFuncion
                 WHERE IdTarifa = @IdTarifa";
         int rows = _connection.Execute(sql, tarifa);
         return rows > 0 ? tarifa.IdTarifa: 0; 

@@ -325,22 +325,23 @@ local.MapGet("/", (ILocalService localService) =>
     return Results.Ok(local);
 });
 
-local.MapGet("/{id:int}", (int localId, ILocalService localService) =>
+local.MapGet("/{localId}", (int localId, ILocalService localService) =>
 {
-    var id = localService.ObtenerPorId(localId);
-    if (local == null)
+    var localEncontrado = localService.ObtenerPorId(localId);
+    if ( localEncontrado == null)
         return Results.NotFound();
-    return Results.Ok(local);
+    return Results.Ok(localEncontrado);
 });
 
-local.MapPut("/{id:int}", (int localId, ILocalService localService, LocalUpdateDto local) =>
+local.MapPut("/{localId}", (int localId , ILocalService localService,LocalUpdateDto local) =>
 {
     var actualizado = localService.ActualizarLocal(localId, local);
-    if (actualizado == 0) return Results.NotFound();
+    if (actualizado == 0) 
+        return Results.NotFound();
     return Results.NoContent();
 });
 
-local.MapDelete("/{id:int}", (int localId, ILocalService localService) =>
+local.MapDelete("/{localId}", (int localId, ILocalService localService) =>
 
 {
     var eliminado = localService.EliminarLocal(localId);

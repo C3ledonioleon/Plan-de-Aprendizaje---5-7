@@ -172,12 +172,31 @@ entradas.MapPost("{entradaId}/anular", (IEntradaService entradaService, int entr
 // ==== QR ==== 
 
 
-entradas.MapGet("/{entradaId}/qr", ([FromRoute] int entradaId, [FromServices] IQRService qrService) =>
+entradas.MapGet("/{entradaId}/qr", ( int entradaId, IEntradaService entradaService, IQRService qrService, IOrdenService ordenService) =>
 {
+      var entrada = entradaService.ObtenerPorId(entradaId);
+    if (entrada == null)
+        return Results.NotFound($"No se encontró la entrada con ID {entradaId}.");
+
+       var orden = ordenService.ObtenerPorId(entrada.IdOrden);
+    if (orden == null)
+        return Results.BadRequest($"No se encontró la orden asociada a la entrada {entradaId}.");
+
+    // Validar si la orden está pagada
+    
+    if (orden.Estado != EstadoOrden.Pagada) 
+    {
+        return Results.BadRequest("Error: No se puede generar el código QR porque la orden no está pagada.");
+    }
     var contenido = $"Entrada {entradaId} - Sistema de Venta de Entradas";
     var qrBytes = qrService.GenerarQR(contenido);
     return Results.File(qrBytes, "image/png");
+    
+    
 });
+
+
+
 
 
 

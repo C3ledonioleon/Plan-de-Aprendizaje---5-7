@@ -47,9 +47,9 @@ public class EntradaRepository : IEntradaRepository
                 SET Precio = @Precio,
                 IdOrden = @IdOrden,
                 IdTarifa = @IdTarifa,
-                IdFuncion = @Funcion,
+                IdFuncion = @IdFuncion,
                 IdCliente = @IdCliente ,
-                Estado = @Estado,
+                Estado = @Estado
                 WHERE IdEntrada = @IdEntrada";
         int rows = _connection.Execute(sql, entrada);
         return rows > 0 ? entrada.IdEntrada: 0;

@@ -171,7 +171,6 @@ entradas.MapPost("{entradaId}/anular", (IEntradaService entradaService, int entr
 
 // ==== QR ==== 
 
-
 entradas.MapGet("/{entradaId}/qr", ( int entradaId, IEntradaService entradaService, IQRService qrService, IOrdenService ordenService) =>
 {
       var entrada = entradaService.ObtenerPorId(entradaId);
@@ -190,14 +189,10 @@ entradas.MapGet("/{entradaId}/qr", ( int entradaId, IEntradaService entradaServi
     }
     var contenido = $"Entrada {entradaId} - Sistema de Venta de Entradas";
     var qrBytes = qrService.GenerarQR(contenido);
+
     return Results.File(qrBytes, "image/png");
     
-    
 });
-
-
-
-
 
 
 #endregion

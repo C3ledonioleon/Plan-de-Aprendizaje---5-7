@@ -170,29 +170,35 @@ entradas.MapPost("{entradaId}/anular", (IEntradaService entradaService, int entr
 });
 
 // ==== QR ==== 
-
-entradas.MapGet("/{entradaId}/qr", ( int entradaId, IEntradaService entradaService, IQRService qrService, IOrdenService ordenService) =>
+entradas.MapGet("/{entradaId}/qr", (int entradaId, IEntradaService entradaService, IQRService qrService, IOrdenService ordenService) =>
 {
-      var entrada = entradaService.ObtenerPorId(entradaId);
+    
+    var entrada = entradaService.ObtenerPorId(entradaId);
     if (entrada == null)
         return Results.NotFound($"No se encontró la entrada con ID {entradaId}.");
 
-       var orden = ordenService.ObtenerPorId(entrada.IdOrden);
+    var orden = ordenService.ObtenerPorId(entrada.IdOrden);
     if (orden == null)
         return Results.BadRequest($"No se encontró la orden asociada a la entrada {entradaId}.");
 
-    // Validar si la orden está pagada
-    
-    if (orden.Estado != EstadoOrden.Pagada) 
-    {
+    if (orden.Estado != EstadoOrden.Pagada)
         return Results.BadRequest("Error: No se puede generar el código QR porque la orden no está pagada.");
-    }
-    var contenido = $"Entrada {entradaId} - Sistema de Venta de Entradas";
+
+    var contenido = $"http://localhost:5257/api/entradas/{entradaId}/qr"; // URL escaneable
     var qrBytes = qrService.GenerarQR(contenido);
 
     return Results.File(qrBytes, "image/png");
-    
 });
+
+entradas.MapPost("/qr/validar", (QRValidacionDto qrDto, IEntradaService entradaService) =>
+{
+    if (string.IsNullOrEmpty(qrDto.Contenido))
+        return Results.BadRequest("El contenido del QR es obligatorio.");
+
+    var resultado = entradaService.ValidarQR(qrDto.Contenido);
+    return Results.Ok(new { resultado });
+});
+
 
 
 #endregion

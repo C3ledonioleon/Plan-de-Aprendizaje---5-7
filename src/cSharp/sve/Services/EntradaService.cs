@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using sve.DTOs;
 using sve.Models;
 using sve.Repositories.Contracts;
@@ -71,4 +72,30 @@ public class EntradaService : IEntradaService
     {
         return _entradaRepository.Delete(id);
     }
+// VALIDA UN QR ESCANEADO
+public string ValidarQR(string contenido)
+{
+    // Buscar el número que aparece después de "/entradas/"
+    var match = Regex.Match(contenido, @"/entradas/(\d+)/qr");
+    if (!match.Success)
+        return "FirmaInvalida";
+
+    int entradaId = int.Parse(match.Groups[1].Value);
+
+    var entrada = _entradaRepository.GetById(entradaId);
+    if (entrada == null)
+        return "NoExiste";
+
+    switch (entrada.Estado)
+    {
+        case EstadoEntrada.Usado: return "Usado";
+        case EstadoEntrada.Vencido: return "Vencido";
+        case EstadoEntrada.Anulada: return "Anulada";
+        default:
+            entrada.Estado = EstadoEntrada.Usado;
+            _entradaRepository.Update(entrada);
+            return "Activa";
+    }
+}
+    
 }

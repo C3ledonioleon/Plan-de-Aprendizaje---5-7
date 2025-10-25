@@ -11,4 +11,5 @@ public interface IEntradaService
     int ActualizarEntrada(int id, EntradaUpdateDto entrada);
     int EliminarEntrada(int id);
     bool AnularEntrada(int id);
+    string ValidarQR(string contenido);
 }

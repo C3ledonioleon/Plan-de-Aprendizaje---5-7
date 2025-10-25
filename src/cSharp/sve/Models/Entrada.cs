@@ -15,7 +15,7 @@ namespace sve.Models
         Activa = 0,   // Todavía no se ha usado
         Usado = 1,    // Ya se utilizó
         Vencido = 2,  // Venció la entrada
-        Anulada = 3   // Se anuló   // Se anuló
+        Anulada = 3 , // Se anuló   // Se anuló  
     }
 }
 

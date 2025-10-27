@@ -86,16 +86,24 @@ public string ValidarQR(string contenido)
     if (entrada == null)
         return "NoExiste";
 
-    switch (entrada.Estado)
-    {
-        case EstadoEntrada.Usado: return "Usado";
-        case EstadoEntrada.Vencido: return "Vencido";
-        case EstadoEntrada.Anulada: return "Anulada";
-        default:
-            entrada.Estado = EstadoEntrada.Usado;
-            _entradaRepository.Update(entrada);
-            return "Activa";
-    }
+if (entrada.Estado == EstadoEntrada.Usado)
+{
+    return "Usado";
+}
+else if (entrada.Estado == EstadoEntrada.Vencido)
+{
+    return "Vencido";
+}
+else if (entrada.Estado == EstadoEntrada.Anulada)
+{
+    return "Anulada";
+}
+else
+{
+    entrada.Estado = EstadoEntrada.Usado;
+    _entradaRepository.Update(entrada);
+    return "Activa";
+}
 }
     
 }

@@ -106,14 +106,6 @@ CREATE TABLE Entrada (
     FOREIGN KEY (IdFuncion) REFERENCES Funcion(IdFuncion)
 );
 
--- RefreshToken (opcional si gestionás varios tokens por usuario)
-CREATE TABLE RefreshToken (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Token VARCHAR(255) NOT NULL,
-    Expira DATETIME NOT NULL,
-    EstaRevocado BIT DEFAULT 0,
-    UsuarioId INT NOT NULL,
-    FOREIGN KEY (UsuarioId) REFERENCES Usuario(IdUsuario)
-);
+
 
 

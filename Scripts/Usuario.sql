@@ -1,33 +1,20 @@
--- Usuario Cliente: puede ver su información y sus entradas, y actualizar su email
-CREATE USER IF NOT EXISTS 'Cliente'@'%' IDENTIFIED BY 'passcliet123';
--- Usuario Administrador: acceso total desde localhost
-CREATE USER IF NOT EXISTS 'Administrador'@'localhost' IDENTIFIED BY 'admin12345';
--- Usuario Molinete: solo registra ingresos, restringido a la LAN
-CREATE USER IF NOT EXISTS 'Molinete'@'10.3.45.%' IDENTIFIED BY 'moli987';
-
+CREATE USER IF NOT EXISTS 'Cliente'@'%' IDENTIFIED BY 'PassCl1et@123';
+CREATE USER IF NOT EXISTS 'Administrador'@'localhost' IDENTIFIED BY 'Admin!2345';
+CREATE USER IF NOT EXISTS 'Molinete'@'10.160.2%' IDENTIFIED BY 'M0linete@987';
 
 -- CLIENTE 
--- Cliente solo puede ver y actualizar su email
-GRANT SELECT, UPDATE(Email) ON SVE.Usuario TO 'Cliente'@'%';
--- Cliente puede ver su información
+GRANT SELECT, UPDATE ON SVE.Usuario TO 'Cliente'@'%';
 GRANT SELECT ON SVE.Cliente TO 'Cliente'@'%';
--- Cliente puede ver sus entradas
 GRANT SELECT ON SVE.Entrada TO 'Cliente'@'%';
--- Cliente puede ver las funciones
 GRANT SELECT ON SVE.Funcion TO 'Cliente'@'%';
--- Cliente puede ver los eventos
 GRANT SELECT ON SVE.Evento TO 'Cliente'@'%';
 
+-- ADMIN
+GRANT ALL ON SVE.* TO 'Administrador'@'localhost';
 
--- Admin
--- Otorgar todos los privilegios sobre la base de datos SVE
-GRANT ALL PRIVILEGES ON SVE.* TO 'Administrador'@'localhost';
+-- MOLINETE
+GRANT SELECT ON SVE.Cliente TO 'Molinete'@'10.3.45.%';
+GRANT SELECT ON SVE.Funcion TO 'Molinete'@'10.3.45.%';
+GRANT SELECT, INSERT, UPDATE ON SVE.Entrada TO 'Molinete'@'10.3.45.%';	
 
 
--- Molinete
--- Lectura de clientes
-GRANT SELECT(IdCliente) ON SVE.Cliente TO 'Molinete'@'10.3.45.%';
--- Lectura de funciones
-GRANT SELECT(IdFuncion) ON SVE.Funcion TO 'Molinete'@'10.3.45.%';
--- Insertar y actualizar entradas
-GRANT SELECT, INSERT, UPDATE(Estado) ON SVE.Entrada TO 'Molinete'@'10.3.45.%';

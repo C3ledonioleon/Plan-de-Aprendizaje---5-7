@@ -572,7 +572,8 @@ auth.MapGet("Roles", (IUsuarioService usuarioService) =>
 });
 
 
-auth.MapPost("/{usuarioId}/rol", [Authorize(Roles = "Administrador")] (int usuarioId, [FromBody] RolUsuario nuevoRol, IUsuarioService usuarioService) =>
+auth.MapPost("/usuarios/{usuarioId}/roles", [Authorize(Roles = "Administrador")]
+(int usuarioId, [FromBody] RolUsuario nuevoRol, IUsuarioService usuarioService) =>
 {
     try
     {
@@ -580,7 +581,7 @@ auth.MapPost("/{usuarioId}/rol", [Authorize(Roles = "Administrador")] (int usuar
         if (usuario == null)
             return Results.NotFound(new { error = "Usuario no encontrado." });
 
-        usuarioService.UpdateRol(usuarioId, nuevoRol);
+        usuarioService.UpdateRol(usuarioId, nuevoRol);  // <-- directamente
 
         return Results.Ok(new { message = $"Rol asignado: {nuevoRol}" });
     }
@@ -589,6 +590,7 @@ auth.MapPost("/{usuarioId}/rol", [Authorize(Roles = "Administrador")] (int usuar
         return Results.BadRequest(new { error = ex.Message });
     }
 });
+
 #endregion
 
 app.Run();

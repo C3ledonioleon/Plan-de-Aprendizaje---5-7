@@ -1,4 +1,4 @@
-DELIMITER //
+DELIMITER $$
 
 CREATE PROCEDURE PagarOrden(IN p_IdOrden INT)
 BEGIN
@@ -31,6 +31,6 @@ BEGIN
         COMMIT;
         SELECT 'Orden pagada exitosamente' AS Mensaje;
     END IF;
-END //
+END $$
 
 DELIMITER ;

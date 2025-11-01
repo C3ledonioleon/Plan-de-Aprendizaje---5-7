@@ -1,12 +1,9 @@
 using FluentValidation;
-using sve.DTOs;
-using sve.Models;
-
-namespace sve.Validations
+namespace sve.DTOs.Validations
 {
-    public class TarifaCreateValidator : AbstractValidator<TarifaCreateDto>
+    public class TarifaValidator : AbstractValidator<TarifaCreateDto>
     {
-        public TarifaCreateValidator()
+        public TarifaValidator()
         {
             RuleFor(t => t.IdFuncion)
                 .GreaterThan(0).WithMessage("Debe especificar una función válida.");
@@ -21,13 +18,13 @@ namespace sve.Validations
                 .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
 
             RuleFor(t => t.Estado)
-                .IsInEnum().WithMessage("El estado de la tarifa no es válido.");
+                .IsInEnum().WithMessage("El estado debe pertenecer en el rango de opciones válidas.");
         }
     }
 
-    public class TarifaUpdateValidator : AbstractValidator<TarifaUpdateDto>
+    public class ActualizarTarifa : AbstractValidator<TarifaUpdateDto>
     {
-        public TarifaUpdateValidator()
+        public ActualizarTarifa()
         {
             RuleFor(t => t.Precio)
                 .GreaterThan(0).WithMessage("El precio debe ser mayor que cero.");
@@ -36,7 +33,7 @@ namespace sve.Validations
                 .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
 
             RuleFor(t => t.Estado)
-                .IsInEnum().WithMessage("El estado de la tarifa no es válido.");
+                .IsInEnum().WithMessage("El estado debe pertenecer en el rango de opciones válidas.");
         }
     }
 }

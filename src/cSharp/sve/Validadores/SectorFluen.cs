@@ -1,11 +1,9 @@
 using FluentValidation;
-using sve.DTOs;
-
-namespace sve.Validations
+namespace sve.DTOs.Validations
 {
-    public class SectorCreateValidator : AbstractValidator<SectorCreateDto>
+    public class SectorValidator : AbstractValidator<SectorCreateDto>
     {
-        public SectorCreateValidator()
+        public SectorValidator()
         {
             RuleFor(s => s.Nombre)
                 .NotEmpty().WithMessage("El nombre del sector es obligatorio.")
@@ -20,13 +18,20 @@ namespace sve.Validations
         }
     }
 
-    public class SectorUpdateValidator : AbstractValidator<SectorUpdateDto>
+    public class ActualizarSector : AbstractValidator<SectorUpdateDto>
     {
-        public SectorUpdateValidator()
+        public ActualizarSector()
         {
-            Include(new SectorCreateValidator());
+            RuleFor(s => s.Nombre)
+                .NotEmpty().WithMessage("El nombre del sector es obligatorio.")
+                .MinimumLength(3).WithMessage("El nombre del sector debe tener al menos 3 caracteres.")
+                .MaximumLength(100).WithMessage("El nombre del sector no puede superar los 100 caracteres.");
 
-            // Si en el futuro se agregan propiedades extra para actualizar, se pueden validar aquí.
+            RuleFor(s => s.Capacidad)
+                .GreaterThan(0).WithMessage("La capacidad debe ser mayor que cero.");
+
+            RuleFor(s => s.IdLocal)
+                .GreaterThan(0).WithMessage("Debe especificar un ID de local válido.");
         }
     }
 }

@@ -10,6 +10,7 @@ public class EntradaCreateDto
     public int IdCliente { get; set; }   // <-- Agregar
     public int IdFuncion { get; set; }
     public EstadoEntrada Estado { get; set; }
+    public object Nombre { get; internal set; }
 }
 
 public class EntradaUpdateDto : EntradaCreateDto

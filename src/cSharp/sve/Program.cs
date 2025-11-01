@@ -11,6 +11,9 @@ using sve.Services.Contracts;
 using System.Data;
 using System.Security.Claims;
 using System.Text;
+using FluentValidation;
+using sve.DTOs.Validations;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,8 @@ builder.Services.AddServices();
 builder.Services.AddRepositories();
 builder.Services.AddScoped<IQRService, QRService>();
 
+builder.Services.AddTransient<IValidator<ClienteCreateDto>, ClienteValidator>();
+builder.Services.AddTransient<IValidator<ClienteUpdateDto>, ActualizarCliente>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -102,9 +107,23 @@ app.UseAuthorization();
 var cliente = app.MapGroup("/api/clientes");
 cliente.WithTags("Cliente "); 
 
-cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente) =>
+cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente,IValidator<ClienteCreateDto> validator) =>
 
 {
+    var ClienrteValidator = new ClienteValidator();
+    var result = validator.Validate(cliente);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+        .GroupBy(a => a.PropertyName)
+        .ToDictionary(
+            g => g.Key,
+
+            g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
+
     var id = clienteService.AgregarCliente(cliente);
     return Results.Created($"/api/clientes/{id}",cliente);
 }
@@ -126,8 +145,22 @@ cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =
     return Results.Ok (cliente);
 }
 );
-cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto cliente, int Id) =>
+cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto cliente, int Id,IValidator<ClienteUpdateDto> validator) =>
 {
+    var ClienrteValidator = new ClienteValidator();
+    var result = ClienrteValidator.Validate(cliente);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+        .GroupBy(a => a.PropertyName)
+        .ToDictionary(
+            g => g.Key,
+
+            g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
+
     var actualizado = clienteService.ActualizarCliente(Id, cliente);
     if (actualizado == 0)
 
@@ -214,6 +247,19 @@ evento.WithTags("Evento");
 evento.MapPost("/",(IEventoService eventoService, EventoCreateDto evento ) =>
 
 {
+    var validadorEvento = new EventoValidator();
+    var result = validadorEvento.Validate(evento);
+
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var id = eventoService.AgregarEvento(evento);
     return Results.Created($"/api/evento{id}", evento);
 } );
@@ -234,8 +280,20 @@ evento.MapGet ("/{eventoId}",(int eventoId ,IEventoService eventoService) =>
 }
 );
 
-evento.MapPut("/{eventoId}",( int eventoId, IEventoService eventoService , EventoUpdateDto evento ) => 
+evento.MapPut("/{eventoId}",( int eventoId, IEventoService eventoService , EventoUpdateDto evento ) =>
 {
+    var validadorEvento = new ActualizarEvento();
+    var result = validadorEvento.Validate(evento);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var actualizado = eventoService.ActualizarEvento (eventoId, evento);
     if (actualizado == 0 ) 
         return Results.NotFound ();
@@ -283,6 +341,19 @@ funcion.WithTags("Funcion");
 
 funcion.MapPost("/", (IFuncionService funcionService, FuncionCreateDto funcion) =>
 {
+    var validadorFuncion = new FuncionValidator();
+    var result = validadorFuncion.Validate(funcion);
+
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var id = funcionService.AgregarFuncion(funcion);
     return Results.Created($"/api/funciones/{id}", funcion);
 });
@@ -305,6 +376,18 @@ funcion.MapGet("/{funcionId}", (int funcionId, IFuncionService funcionService) =
 
 funcion.MapPut("/{funcionId}", (int funcionId, IFuncionService funcionService, FuncionUpdateDto funcion) =>
 {
+    var validadorFuncion = new ActualizarFuncion();
+    var result = validadorFuncion.Validate(funcion);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var actualizado = funcionService.ActualizarFuncion(funcionId, funcion);
     if (actualizado == 0)
         return Results.NotFound();
@@ -335,6 +418,19 @@ local.WithTags("Local");
 
 local.MapPost("/", (ILocalService localService, LocalCreateDto local) =>
 {
+    var validadorLocal = new LocalValidator();
+    var result = validadorLocal.Validate(local);    
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
+
     var id = localService.AgregarLocal(local);
     return Results.Created($"/api/local/{id}", local);
 });
@@ -355,6 +451,19 @@ local.MapGet("/{localId}", (int localId, ILocalService localService) =>
 
 local.MapPut("/{localId}", (int localId , ILocalService localService,LocalUpdateDto local) =>
 {
+    var validadorLocal = new ActualizarLocal();
+    var result = validadorLocal.Validate(local);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }   
+
     var actualizado = localService.ActualizarLocal(localId, local);
     if (actualizado == 0) 
         return Results.NotFound();
@@ -378,6 +487,19 @@ orden.WithTags("Orden");
 
 orden.MapPost("/", (OrdenCreateDto orden, IOrdenService ordenService) =>
 {
+    var validadorOrden = new OrdenValidator();
+    var result = validadorOrden.Validate(orden);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
+
     var ordenId = ordenService.AgregarOrden(orden);
     return Results.Ok(new { IdOrden = ordenId });
 });
@@ -429,6 +551,19 @@ sector.WithTags("Sector");
 
 sector.MapPost("/", (ISectorService sectorService, SectorCreateDto sector) =>
 {
+    var validadorSector = new SectorValidator();
+    var result = validadorSector.Validate(sector);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
+
     var id = sectorService.AgregarSector(sector);
     return Results.Created($"/api/sectores/{id}", sector);
 });
@@ -449,6 +584,18 @@ sector.MapGet("/{sectorId}", (int sectorId,ISectorService sectorService) =>
 
 sector.MapPut("/{sectorId}", (int sectorId, ISectorService sectorService, SectorUpdateDto sector) =>
 {
+    var validadorSector = new ActualizarSector();
+    var result = validadorSector.Validate(sector);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var actualizado = sectorService.ActualizarSector(sectorId, sector);
     if (actualizado == 0)
         return Results.NotFound();
@@ -471,6 +618,18 @@ tarifa.WithTags("Tarifa");
 
 tarifa.MapPost("/", (ITarifaService tarifaService, TarifaCreateDto tarifa) =>
 {
+    var validadorTarifa = new TarifaValidator();
+    var result = validadorTarifa.Validate(tarifa);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var id = tarifaService.AgregarTarifa(tarifa);
     return Results.Created($"/api/tarifas/{id}", tarifa);
 });
@@ -491,6 +650,18 @@ tarifa.MapGet("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 
 tarifa.MapPut("/{tarifaId}", ( int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
 {
+    var validadorTarifa = new ActualizarTarifa();
+    var result = validadorTarifa.Validate(tarifa);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var actualizado = tarifaService.ActualizarTarifa(tarifaId, tarifa);
     if (actualizado == 0)
         return Results.NotFound();
@@ -515,6 +686,18 @@ auth.WithTags("Auth");
 
 auth.MapPost("Register", (IUsuarioService usuarioService, RegisterDto usuario) =>
 {
+    var validadorRegistro = new RegisterDtoValidator();
+    var result = validadorRegistro.Validate(usuario);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var id = usuarioService.Register(usuario);
     return Results.Created($"/api/usuarios/{id}", usuario);
 });
@@ -522,6 +705,18 @@ auth.MapPost("Register", (IUsuarioService usuarioService, RegisterDto usuario) =
 
 auth.MapPost("Login", (IUsuarioService usuarioService, LoginDto usuario) =>
 {
+    var validadorLogin = new LoginDtoValidator();
+    var result = validadorLogin.Validate(usuario);
+    if (!result.IsValid)
+    {
+        var listaErrores = result.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+        return Results.ValidationProblem(listaErrores);
+    }
     var tokens = usuarioService.Login(usuario);
     return Results.Ok(tokens);
 });

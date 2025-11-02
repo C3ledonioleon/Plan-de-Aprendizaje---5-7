@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySql.Data.MySqlClient;
-using sve.DTOs;
-using sve.Models;
-using sve.Services;
-using sve.Services.Contracts;
+using sveCore.DTOs;
+using sveCore.Models;
+using sveService.Services;
+using sveCore.Services.IServices;
 using System.Data;
 using System.Security.Claims;
 using System.Text;
 using FluentValidation;
-using sve.DTOs.Validations;
+using sveServicio.Validation;
 
 
 var builder = WebApplication.CreateBuilder(args);

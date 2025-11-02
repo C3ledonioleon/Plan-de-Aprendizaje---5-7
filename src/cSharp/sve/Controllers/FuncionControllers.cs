@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using sve.Models;
-using sve.DTOs;
-using sve.Services.Contracts;
+using sveCore.DTOs;
+using sveCore.Models;
+using sveCore.Services.IServices;
+
 
 namespace sve.Controllers
 {

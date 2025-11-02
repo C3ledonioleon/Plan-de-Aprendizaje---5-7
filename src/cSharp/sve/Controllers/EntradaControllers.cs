@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using sve.DTOs;
-using sve.Models;
-using sve.Services.Contracts;
+using sveCore.DTOs;
+using sveCore.Models;
+using sveCore.Services.IServices;
+
 using System.Text;
 using System.Security.Cryptography;
 using QRCoder;

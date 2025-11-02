@@ -8,6 +8,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sve.tests", "src\cSharp\sve.tests\sve.tests.csproj", "{6EFE7CA4-E464-42E5-8084-F6042EF8397D}"
 EndProject
 Global
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sveCore", "src\cSharp\sveCore\sveCore.csproj", "{D85762F8-0BFA-485F-B880-4D28F1821FA4}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sveDapper", "src\cSharp\sveDapper\sveDapper.csproj", "{50BC2DDB-06C0-4C99-997A-ADB8484DF396}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sveServices", "src\cSharp\sveServices\sveServices.csproj", "{50BC2DDB-06C0-4C99-997A-ADB8484DF396}"
+EndProject
+
+
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

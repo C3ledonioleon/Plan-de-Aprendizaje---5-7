@@ -1,0 +1,79 @@
+using sveCore.DTOs;
+using sveCore.Models;
+using sveCore.Servicio.IRepositories;
+using sveCore.Services.IServices;
+
+
+namespace sveServices.Services;
+
+public class FuncionService : IFuncionService
+{  
+    private readonly IFuncionRepository _funcionRepository;
+
+    public FuncionService(IFuncionRepository funcionRepository)
+    {
+        _funcionRepository = funcionRepository;
+    }
+
+    public List<FuncionDto> ObtenerTodo()
+    {
+        return _funcionRepository.GetAll()
+            .Select(funcion => new FuncionDto
+            {
+                IdFuncion = funcion.IdFuncion,
+                IdEvento = funcion.IdEvento,
+                IdLocal = funcion.IdLocal,
+                FechaHora = funcion.FechaHora,
+                Estado = funcion.Estado
+            }).ToList();
+    }
+
+    public Funcion? ObtenerPorId(int id)
+    {
+        return _funcionRepository.GetById(id);
+    }
+
+    public int AgregarFuncion(FuncionCreateDto funcion)
+    {
+        var nuevaFuncion = new Funcion
+        {
+            IdEvento = funcion.IdEvento,
+            IdLocal = funcion.IdLocal,
+            FechaHora = funcion.FechaHora,
+            Estado = EstadoFuncion.Pendiente // Valor inicial
+        };
+
+        return _funcionRepository.Add(nuevaFuncion);
+    }
+
+    public int ActualizarFuncion(int id, FuncionUpdateDto funcion)
+    {
+        var entidad = new Funcion
+        {
+            IdFuncion = id,
+            IdEvento = funcion.IdEvento,
+            IdLocal = funcion.IdLocal,
+            FechaHora = funcion.FechaHora,
+            Estado = funcion.Estado
+        };
+
+        return _funcionRepository.Update(entidad);
+    }
+
+    public int EliminarFuncion(int id)
+    {
+        return _funcionRepository.Delete(id);
+    }
+
+    public int CancelarFuncion(int id)
+    {
+        var funcion = _funcionRepository.GetById(id);
+        if (funcion == null) return 0;
+
+        funcion.Estado = EstadoFuncion.Cancelada;
+
+        return _funcionRepository.Update(funcion);
+    }
+
+    
+}

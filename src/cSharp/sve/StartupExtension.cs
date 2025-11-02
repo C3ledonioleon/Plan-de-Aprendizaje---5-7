@@ -1,7 +1,7 @@
-using sve.Repositories;
-using sve.Repositories.Contracts;
-using sve.Services;
-using sve.Services.Contracts;
+using sveDapper.Repositories;
+using sveCore.Servicio.IRepositories;
+using sveServices.Services;
+using sveCore.Services.IServices;
 
 public static class StartupExtension
 {

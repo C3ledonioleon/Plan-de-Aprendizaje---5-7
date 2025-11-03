@@ -1,8 +1,6 @@
-
 DROP DATABASE IF EXISTS  5to_SVE;
 CREATE DATABASE  5to_SVE;
 USE 5to_SVE;
-
 
 -- Usuario
 CREATE TABLE Usuario (

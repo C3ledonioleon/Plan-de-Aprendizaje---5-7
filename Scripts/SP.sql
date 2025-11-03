@@ -1,8 +1,16 @@
+USE 5to_SVE; 
+
 DELIMITER $$
 
 CREATE PROCEDURE PagarOrden(IN p_IdOrden INT)
 BEGIN
     DECLARE v_StockInsuficiente INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error al procesar la orden. Transacción revertida.' AS Mensaje;
+    END;
 
     START TRANSACTION;
 
@@ -14,7 +22,9 @@ BEGIN
     IF v_StockInsuficiente > 0 THEN
         ROLLBACK;
         SELECT 'Stock insuficiente para una o más tarifas' AS Mensaje;
+
     ELSE
+
         UPDATE Orden 
         SET Estado = 1
         WHERE IdOrden = p_IdOrden;
@@ -32,5 +42,4 @@ BEGIN
         SELECT 'Orden pagada exitosamente' AS Mensaje;
     END IF;
 END $$
-
 DELIMITER ;

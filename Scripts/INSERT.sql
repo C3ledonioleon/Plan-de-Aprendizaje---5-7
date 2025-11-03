@@ -1,5 +1,3 @@
-
-
 -- Inserts para Usuario
 INSERT INTO Usuario ( Username, password ,Email,Rol) VALUES
 ('juan123', 'pass1', 'juan123@gmail.com',2),

@@ -24,9 +24,9 @@ GRANT SELECT ON 5to_SVE.Sector TO 'Organizador'@'%';
 GRANT ALL ON SVE.* TO 'Administrador'@'localhost';
 
 -- MOLINETE
-GRANT SELECT ON SVE.Cliente TO 'Molinete'@'10.3.45.%';
-GRANT SELECT ON SVE.Funcion TO 'Molinete'@'10.3.45.%';
-GRANT SELECT, INSERT, UPDATE ON SVE.Entrada TO 'Molinete'@'10.3.45.%';	
+GRANT SELECT ON SVE.Cliente TO 'Molinete'@'10.160.2%';
+GRANT SELECT ON SVE.Funcion TO 'Molinete'@'10.160.2%%';
+GRANT SELECT, INSERT, UPDATE ON SVE.Entrada TO 'Molinete'@'10.160.2%%';	
 
 FLUSH PRIVILEGES;
 

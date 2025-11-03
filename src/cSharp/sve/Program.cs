@@ -765,7 +765,7 @@ auth.MapGet("Roles", (IUsuarioService usuarioService) =>
     var roles = Enum.GetNames(typeof(RolUsuario));
     return Results.Ok(roles);
 });
-
+        
 
 auth.MapPost("/usuarios/{usuarioId}/roles", [Authorize(Roles = "Administrador")]
 (int usuarioId, [FromBody] RolUsuario nuevoRol, IUsuarioService usuarioService) =>

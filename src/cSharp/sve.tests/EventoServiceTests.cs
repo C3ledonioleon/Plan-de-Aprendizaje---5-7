@@ -1,12 +1,12 @@
 using Xunit;
 using Moq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using sve.DTOs;
-using sve.Models;
-using sve.Repositories.Contracts;
-using sve.Services;
+using System;
+using sveCore.Models;
+using sveCore.Servicio.IRepositories;
+using sveServices.Services;
+using sveCore.DTOs;
 
 namespace sve.Tests.Services
 {

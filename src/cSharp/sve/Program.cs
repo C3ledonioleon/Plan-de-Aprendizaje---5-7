@@ -56,10 +56,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddScoped<QRService>();
 
-var connectionString = builder.Configuration.GetConnectionString("myBD");
+var connectionString = builder.Configuration.GetConnectionString("Organizador");
+
 
 builder.Services.AddScoped<IDbConnection>(sp =>
     new MySqlConnection(connectionString));
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -100,9 +102,6 @@ app.UseAuthorization();
 
 
 
-
-
-// === Cliente Controller =====
 #region Cliente 
 var cliente = app.MapGroup("/api/clientes");
 cliente.WithTags("Cliente "); 
@@ -170,7 +169,6 @@ cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto
 });
 
 #endregion
-
 #region Entrada
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
@@ -235,9 +233,6 @@ entradas.MapPost("/qr/validar", (QRValidacionDto qrDto, IEntradaService entradaS
 
 
 #endregion
-
-
-// === EventoController === 
 #region Evento
 var evento = app.MapGroup ("/api/eventos");
 
@@ -333,7 +328,6 @@ evento.MapPost ("/{eventoId}/cancelar", (int id , IEventoService eventoService) 
     return Results.Ok(new { mensaje = "Evento cancelado correctamente"});
 });
 #endregion 
-
 #region Funcion
 var funcion = app.MapGroup("/api/funciones");
 
@@ -410,7 +404,6 @@ funcion.MapPost("/{funcionId}/cancelar", (int funcionId, IFuncionService funcion
     return Results.Ok(new { mensaje = "Función cancelada correctamente" });
 });
 #endregion
-
 #region Local
 
 var local = app.MapGroup("api/locales");
@@ -478,8 +471,6 @@ local.MapDelete("/{localId}", (int localId, ILocalService localService) =>
     return Results.NoContent();
 });
 #endregion
-
-
 #region Orden
 
 var orden = app.MapGroup("api/ordenes");
@@ -544,7 +535,6 @@ orden.MapPost ("/{ordenId}/cancelar",(int ordenId, IOrdenService ordenService )=
 );
 
 #endregion
-
 #region Sector
 var sector = app.MapGroup("/api/sectores");
 sector.WithTags("Sector");
@@ -611,7 +601,6 @@ sector.MapDelete("/{sectorId}", (int sectorId, ISectorService sectorService) =>
 });
 
 #endregion
-
 #region Tarifa
 var tarifa = app.MapGroup("/api/tarifas");
 tarifa.WithTags("Tarifa");
@@ -678,8 +667,6 @@ tarifa.MapDelete("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 });
 
 #endregion
-
-
 #region Usuario
 var auth = app.MapGroup("/api/Auth");
 auth.WithTags("Auth");
@@ -702,7 +689,6 @@ auth.MapPost("Register", (IUsuarioService usuarioService, RegisterDto usuario) =
     return Results.Created($"/api/usuarios/{id}", usuario);
 });
 
-
 auth.MapPost("Login", (IUsuarioService usuarioService, LoginDto usuario) =>
 {
     var validadorLogin = new LoginDtoValidator();
@@ -721,7 +707,6 @@ auth.MapPost("Login", (IUsuarioService usuarioService, LoginDto usuario) =>
     return Results.Ok(tokens);
 });
 
-
 auth.MapPost("Refresh", (IUsuarioService usuarioService, [FromBody] string refreshToken) =>
 {
     try
@@ -736,7 +721,6 @@ auth.MapPost("Refresh", (IUsuarioService usuarioService, [FromBody] string refre
         );
 }
 });
-
 
 auth.MapPost("Logout", [Authorize] (IUsuarioService usuarioService, HttpContext httpContext) =>
 {

@@ -16,7 +16,7 @@ public class Usuario
 public enum RolUsuario
 {
     Administrador = 1,
-    Empleado = 2,
-    Cliente = 3,
-    Soporte = 4
+    Cliente = 2,
+    Organizador = 3,
+    Molinete = 4
 }

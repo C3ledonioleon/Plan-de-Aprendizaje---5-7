@@ -56,7 +56,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddScoped<QRService>();
 
-var connectionString = builder.Configuration.GetConnectionString("Organizador");
+var connectionString = builder.Configuration.GetConnectionString("myBD");
 
 
 builder.Services.AddScoped<IDbConnection>(sp =>

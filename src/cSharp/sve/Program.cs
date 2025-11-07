@@ -71,6 +71,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var config = builder.Configuration.GetSection("JwtSettings");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -83,9 +84,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SoloAdmin", p => p.RequireRole("Administrador"));
+    options.AddPolicy("SoloUsuario", p => p.RequireRole("Usurio"));
+    options.AddPolicy("SoloOrganizador", p => p.RequireRole("Organizador"));
+    options.AddPolicy("SoloMolinete", p => p.RequireRole("Molinete"));
+});
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -104,7 +113,9 @@ app.UseAuthorization();
 
 #region Cliente 
 var cliente = app.MapGroup("/api/clientes");
-cliente.WithTags("Cliente "); 
+cliente.WithTags("Cliente ");
+
+cliente.RequireAuthorization();
 
 cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente,IValidator<ClienteCreateDto> validator) =>
 
@@ -124,16 +135,20 @@ cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente,IV
     }
 
     var id = clienteService.AgregarCliente(cliente);
-    return Results.Created($"/api/clientes/{id}",cliente);
-}
+    return Results.Created($"/api/clientes/{id}", cliente);
+    
+}).RequireAuthorization("SoloAdmin"); 
 
-);
 
-cliente.MapGet("/",(IClienteService clienteService ) =>
+
+cliente.MapGet("/", (IClienteService clienteService) =>
 {
     var lista = clienteService.ObtenerTodo();
     return Results.Ok(lista);
-});
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Cliente" });
+
+
+
 
 cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =>
 
@@ -141,9 +156,10 @@ cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =
     var cliente = clienteService.ObtenerPorId(clienteId);
     if (cliente == null)
         return Results.NotFound();
-    return Results.Ok (cliente);
-}
-);
+    return Results.Ok(cliente);
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Cliente" });
+
+
 cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto cliente, int Id,IValidator<ClienteUpdateDto> validator) =>
 {
     var ClienrteValidator = new ClienteValidator();
@@ -164,20 +180,22 @@ cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto
     if (actualizado == 0)
 
         return Results.NotFound();
-
     return Results.NoContent();
-});
+}).RequireAuthorization("SoloAdmin"); // ✅ SOLO ADMIN
 
 #endregion
 #region Entrada
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
 
+// TODO EL GRUPO REQUIERE ESTAR LOGUEADO
+entradas.RequireAuthorization();
+
 entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
 {
     var id = entradaService.AgregarEntrada(entrada);
     return Results.Created($"api/entrada/{id}", entrada);
-});
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 entradas.MapGet("/", (IEntradaService entradaService) =>
 {
@@ -234,13 +252,13 @@ entradas.MapPost("/qr/validar", (QRValidacionDto qrDto, IEntradaService entradaS
 
 #endregion
 #region Evento
-var evento = app.MapGroup ("/api/eventos");
+var evento = app.MapGroup("/api/eventos");
 
 evento.WithTags("Evento");
 
+evento.RequireAuthorization();  
 
-evento.MapPost("/",(IEventoService eventoService, EventoCreateDto evento ) =>
-
+evento.MapPost("/", (IEventoService eventoService, EventoCreateDto evento) =>
 {
     var validadorEvento = new EventoValidator();
     var result = validadorEvento.Validate(evento);
@@ -253,32 +271,38 @@ evento.MapPost("/",(IEventoService eventoService, EventoCreateDto evento ) =>
                 g => g.Key,
                 g => g.Select(e => e.ErrorMessage).ToArray()
             );
+
         return Results.ValidationProblem(listaErrores);
     }
+
     var id = eventoService.AgregarEvento(evento);
-    return Results.Created($"/api/evento{id}", evento);
-} );
+    return Results.Created($"/api/eventos/{id}", evento);
 
-evento.MapGet ("/",(IEventoService eventoService )=>
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
+
+evento.MapGet("/", (IEventoService eventoService) =>
 {
-    var evento = eventoService.ObtenerTodo();
-    return Results.Ok(evento);
-} );
+    var lista = eventoService.ObtenerTodo();
+    return Results.Ok(lista);
 
-evento.MapGet ("/{eventoId}",(int eventoId ,IEventoService eventoService) =>
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario" });
 
+
+evento.MapGet("/{eventoId}", (int eventoId, IEventoService eventoService) =>
 {
-  var evento = eventoService.ObtenerPorId(eventoId);
-  if (evento == null ) return Results.NotFound();
-   return Results.Ok (evento);
-}
-);
+    var eventoDb = eventoService.ObtenerPorId(eventoId);
+    if (eventoDb == null) return Results.NotFound();
+    return Results.Ok(eventoDb);
 
-evento.MapPut("/{eventoId}",( int eventoId, IEventoService eventoService , EventoUpdateDto evento ) =>
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
+
+
+evento.MapPut("/{eventoId}", (int eventoId, IEventoService eventoService, EventoUpdateDto evento) =>
 {
     var validadorEvento = new ActualizarEvento();
     var result = validadorEvento.Validate(evento);
+
     if (!result.IsValid)
     {
         var listaErrores = result.Errors
@@ -287,51 +311,56 @@ evento.MapPut("/{eventoId}",( int eventoId, IEventoService eventoService , Event
                 g => g.Key,
                 g => g.Select(e => e.ErrorMessage).ToArray()
             );
+
         return Results.ValidationProblem(listaErrores);
     }
-    var actualizado = eventoService.ActualizarEvento (eventoId, evento);
-    if (actualizado == 0 ) 
-        return Results.NotFound ();
 
-    return Results.NoContent ();
-} );
+    var actualizado = eventoService.ActualizarEvento(eventoId, evento);
+    if (actualizado == 0)
+        return Results.NotFound();
 
-evento.MapDelete("/{eventoId}",(int eventoId ,IEventoService eventoService ) =>
+    return Results.NoContent();
 
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
+evento.MapDelete("/{eventoId}", (int eventoId, IEventoService eventoService) =>
 {
-    var eliminado = eventoService.EliminarEvento (eventoId);
-    if (eliminado == 0 ) 
-        return Results.NotFound() ;
+    var eliminado = eventoService.EliminarEvento(eventoId);
+    if (eliminado == 0)
+        return Results.NotFound();
 
-    return Results.NoContent ();
-});
+    return Results.NoContent();
 
-evento.MapPost("/{eventoId}/publicar",(int id, IEventoService eventoService) => 
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador" });
 
+evento.MapPost("/{eventoId}/publicar", (int id, IEventoService eventoService) =>
 {
     var publicado = eventoService.Publicar(id);
-    if(publicado == 0 ) 
-     return Results.NotFound();
+    if (publicado == 0)
+        return Results.NotFound();
 
-    return Results.Ok (new {mensaje = "Evento publicado correctamente"});
-});
+    return Results.Ok(new { mensaje = "Evento publicado correctamente" });
 
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
-evento.MapPost ("/{eventoId}/cancelar", (int id , IEventoService eventoService) =>
+// ✅ CANCELAR EVENTO (Administrador, Organizador)
+evento.MapPost("/{eventoId}/cancelar", (int id, IEventoService eventoService) =>
+{
+    var cancelado = eventoService.Cancelar(id);
+    if (cancelado == 0)
+        return Results.NotFound();
 
-{   
-    var cancelado = eventoService.Cancelar ( id);
-    if (cancelado == 0 ) 
-    return Results.NotFound();
-    
-    return Results.Ok(new { mensaje = "Evento cancelado correctamente"});
-});
-#endregion 
+    return Results.Ok(new { mensaje = "Evento cancelado correctamente" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
+
+#endregion
 #region Funcion
 var funcion = app.MapGroup("/api/funciones");
 
 funcion.WithTags("Funcion");
+
+funcion.RequireAuthorization();
 
 funcion.MapPost("/", (IFuncionService funcionService, FuncionCreateDto funcion) =>
 {
@@ -348,30 +377,37 @@ funcion.MapPost("/", (IFuncionService funcionService, FuncionCreateDto funcion) 
             );
         return Results.ValidationProblem(listaErrores);
     }
+
     var id = funcionService.AgregarFuncion(funcion);
     return Results.Created($"/api/funciones/{id}", funcion);
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 funcion.MapGet("/", (IFuncionService funcionService) =>
 {
     var funciones = funcionService.ObtenerTodo();
     if (funciones == null)
         return Results.NotFound();
+
     return Results.Ok(funciones);
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario" });
 
 funcion.MapGet("/{funcionId}", (int funcionId, IFuncionService funcionService) =>
 {
     var funcionEncontrada = funcionService.ObtenerPorId(funcionId);
     if (funcionEncontrada == null)
         return Results.NotFound();
+
     return Results.Ok(funcionEncontrada);
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 funcion.MapPut("/{funcionId}", (int funcionId, IFuncionService funcionService, FuncionUpdateDto funcion) =>
 {
     var validadorFuncion = new ActualizarFuncion();
     var result = validadorFuncion.Validate(funcion);
+
     if (!result.IsValid)
     {
         var listaErrores = result.Errors
@@ -382,27 +418,36 @@ funcion.MapPut("/{funcionId}", (int funcionId, IFuncionService funcionService, F
             );
         return Results.ValidationProblem(listaErrores);
     }
+
     var actualizado = funcionService.ActualizarFuncion(funcionId, funcion);
     if (actualizado == 0)
         return Results.NotFound();
+
     return Results.NoContent();
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
+
 
 funcion.MapDelete("/{funcionId}", (int funcionId, IFuncionService funcionService) =>
 {
     var eliminado = funcionService.EliminarFuncion(funcionId);
     if (eliminado == 0)
         return Results.NotFound();
+
     return Results.NoContent();
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador" });
 
 funcion.MapPost("/{funcionId}/cancelar", (int funcionId, IFuncionService funcionService) =>
 {
     var actualizado = funcionService.CancelarFuncion(funcionId);
     if (actualizado == 0)
         return Results.NotFound();
+
     return Results.Ok(new { mensaje = "Función cancelada correctamente" });
-});
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
+
 #endregion
 #region Local
 

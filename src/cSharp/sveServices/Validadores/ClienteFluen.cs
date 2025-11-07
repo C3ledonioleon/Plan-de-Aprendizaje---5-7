@@ -21,6 +21,10 @@ namespace sveServicio.Validation
                 .GreaterThan(0).WithMessage("Debe asociarse un usuario válido al cliente.");
 
         }
+
+        public class CrearCliente
+        {
+        }
     }
     public class ActualizarCliente : AbstractValidator<ClienteUpdateDto>
     {

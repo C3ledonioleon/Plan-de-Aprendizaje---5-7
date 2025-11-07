@@ -15,7 +15,7 @@ CREATE TABLE Usuario (
 
 -- INSERTAR USUARIO ADMINISTRADOR POR DEFECTO
 INSERT INTO Usuario (Username, Email, Password, Rol)
-VALUES ('admin', 'admin@admin', 'ef92b778bafe771e89245b89ecbcfbabf2b0e1b1b6b5c8232e1c4f7d5f7c5a3a', 1);
+VALUES ('admin', 'admin@gmail.com', '3eb3fe66b31e3b4d10fa70b5cad49c7112294af6ae4e476a1c405155d45aa121', 1);
 
 -- Cliente
 CREATE TABLE Cliente (

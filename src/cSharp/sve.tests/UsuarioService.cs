@@ -56,7 +56,7 @@ namespace sveServices.Tests
                 Username = "Juan",
                 Email = "juan@mail.com",
                 Contraseña = "1234",
-                Rol = RolUsuario.Cliente
+                Rol = RolUsuario.Usuario
             };
 
             _usuarioRepositoryMock.Setup(r => r.GetByEmail(registerDto.Email)).Returns((Usuario?)null);
@@ -79,7 +79,7 @@ namespace sveServices.Tests
                 Username = "Juan",
                 Email = "juan@mail.com",
                 Contraseña = "1234",
-                Rol = RolUsuario.Cliente
+                Rol = RolUsuario.Usuario
             };
 
             _usuarioRepositoryMock.Setup(r => r.GetByEmail(registerDto.Email))
@@ -100,7 +100,7 @@ namespace sveServices.Tests
                 Email = "juan@mail.com",
                 Password = Convert.ToHexString(System.Security.Cryptography.SHA256.Create()
                     .ComputeHash(System.Text.Encoding.UTF8.GetBytes("1234"))).ToLower(),
-                Rol = RolUsuario.Cliente
+                Rol = RolUsuario.Usuario
             };
 
             var loginDto = new LoginDto
@@ -144,7 +144,7 @@ namespace sveServices.Tests
                 IdUsuario = 1,
                 Username = "Juan",
                 Email = "juan@mail.com",
-                Rol = RolUsuario.Cliente
+                Rol = RolUsuario.Usuario
             };
 
             _usuarioRepositoryMock.Setup(r => r.GetById(usuario.IdUsuario)).Returns(usuario);

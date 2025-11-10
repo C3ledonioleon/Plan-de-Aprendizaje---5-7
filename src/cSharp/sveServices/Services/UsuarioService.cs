@@ -33,8 +33,9 @@ public class UsuarioService : IUsuarioService
             Username = registerDto.Username,
             Email = registerDto.Email,
             Password = HashPassword(registerDto.Contraseña),
-            Rol = registerDto.Rol
+            Rol = RolUsuario.Usuario
         };
+        
 
         return _usuarioRepository.Add(usuario);
     }

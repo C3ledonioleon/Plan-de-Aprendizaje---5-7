@@ -17,12 +17,8 @@ namespace sveServicio.Validation
 
             RuleFor(u => u.Contraseña)
                 .NotEmpty().WithMessage("La contraseña es obligatoria.")
-                .MinimumLength(8).WithMessage("La contraseña debe tener al menos 8 caracteres.")
+                .MinimumLength(5).WithMessage("La contraseña debe tener al menos 8 caracteres.")
                 .Matches("[A-Z]").WithMessage("La contraseña debe contener al menos una letra mayúscula.");
-
-            RuleFor(u => u.Rol)
-                .NotNull().WithMessage("El rol del usuario es obligatorio.")
-                .IsInEnum().WithMessage("El rol seleccionado no es válido.");
         }
     }
 

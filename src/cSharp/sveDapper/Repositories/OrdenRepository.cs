@@ -8,10 +8,12 @@ namespace sveDapper.Repositories;
 public class OrdenRepository : IOrdenRepository
 {
     private readonly IDbConnection _connection;
+    private readonly EntradaRepository entradaRepository;
 
     public OrdenRepository(IDbConnection connection)
     {
         _connection = connection;
+        entradaRepository = new EntradaRepository(_connection);
     }
 
     public List<Orden> GetAll()
@@ -49,6 +51,16 @@ public class OrdenRepository : IOrdenRepository
                     IdTarifa = @IdTarifa
                 WHERE IdOrden = @IdOrden";
         int rows = _connection.Execute(sql, orden);
+
+        Entrada entrada = new Entrada();
+
+        entrada.Precio = orden.Total;
+        entrada.IdCliente = orden.IdCliente;
+        entrada.IdOrden = orden.IdOrden;
+        entrada.IdTarifa = orden.IdTarifa;
+        entrada.IdFuncion = _connection.QueryFirstOrDefault<Funcion>("SELECT * FROM Funcion JOIN Tarifa USING (IdFuncion) WHERE IdTarifa = @ID", new { ID = orden.IdTarifa })!.IdFuncion;
+        entrada.Estado = EstadoEntrada.Activa;
+        entradaRepository.Add(entrada);
         return rows > 0 ? orden.IdOrden : 0;
     }
 

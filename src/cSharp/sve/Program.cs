@@ -188,13 +188,6 @@ entradas.WithTags("Entradas");
 
 entradas.RequireAuthorization();
 
-entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
-{
-    var id = entradaService.AgregarEntrada(entrada);
-    return Results.Created($"api/entrada/{id}", entrada);
-    
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
-
 entradas.MapGet("/", (IEntradaService entradaService) =>
 {
     var lista = entradaService.ObtenerTodo();

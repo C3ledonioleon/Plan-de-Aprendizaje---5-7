@@ -29,5 +29,7 @@
     <ProjectReference Include="..\sveCore\sveCore.csproj" />
     <ProjectReference Include="..\sveDapper\sveDapper.csproj" />
     <ProjectReference Include="..\sveServices\sveServices.csproj" />
+
+    
   </ItemGroup>
 </Project>

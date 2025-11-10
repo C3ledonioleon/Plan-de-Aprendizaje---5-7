@@ -86,7 +86,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SoloAdmin", p => p.RequireRole("Administrador"));
-    options.AddPolicy("SoloUsuario", p => p.RequireRole("Usurio"));
+    options.AddPolicy("SoloUsuario", p => p.RequireRole("Usuario"));
     options.AddPolicy("SoloOrganizador", p => p.RequireRole("Organizador"));
     options.AddPolicy("SoloMolinete", p => p.RequireRole("Molinete"));
 });
@@ -136,15 +136,14 @@ cliente.MapPost("/",(IClienteService clienteService, ClienteCreateDto cliente,IV
     var id = clienteService.AgregarCliente(cliente);
     return Results.Created($"/api/clientes/{id}", cliente);
     
-}).RequireAuthorization("SoloAdmin"); 
-
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
 
 
 cliente.MapGet("/", (IClienteService clienteService) =>
 {
     var lista = clienteService.ObtenerTodo();
     return Results.Ok(lista);
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Cliente" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
 
 
 
@@ -156,7 +155,7 @@ cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =
     if (cliente == null)
         return Results.NotFound();
     return Results.Ok(cliente);
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Cliente" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
 
 
 cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto cliente, int Id,IValidator<ClienteUpdateDto> validator) =>
@@ -187,13 +186,13 @@ cliente.MapPut("/{clienteId}", (IClienteService clienteService, ClienteUpdateDto
 var entradas = app.MapGroup("/api/entradas");
 entradas.WithTags("Entradas");
 
-// TODO EL GRUPO REQUIERE ESTAR LOGUEADO
 entradas.RequireAuthorization();
 
 entradas.MapPost("/", (IEntradaService entradaService, EntradaCreateDto entrada) =>
 {
     var id = entradaService.AgregarEntrada(entrada);
     return Results.Created($"api/entrada/{id}", entrada);
+    
 }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 entradas.MapGet("/", (IEntradaService entradaService) =>
@@ -553,16 +552,14 @@ orden.MapPost("/", (OrdenCreateDto orden, IOrdenService ordenService) =>
 
     var ordenId = ordenService.AgregarOrden(orden);
     return Results.Ok(new { IdOrden = ordenId });
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });  
-// Crear orden → solo Admin u Organizador
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
 
 orden.MapGet("/", (IOrdenService ordenService) =>
 {
     var ordenes = ordenService.ObtenerTodo();
     return Results.Ok(ordenes);
 })
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Molinete" });
+.RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Molinete" });
 // Ver TODAS las órdenes
 
 
@@ -573,7 +570,7 @@ orden.MapGet("/{ordenId}", (int ordenId, IOrdenService ordenService) =>
         return Results.NotFound();
     return Results.Ok(orden);
 })
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Molinete" });
+.RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador, Molinete" });
 // Ver una orden específica
 
 
@@ -585,8 +582,7 @@ orden.MapPost("/{ordenId}/pagar", (int ordenId, IOrdenService ordenService) =>
         return Results.BadRequest("No se pudo procesar el pago o la orden no existe.");
 
     return Results.Ok(new { mesaje = "Orden pagada y entradas emitidas" });
-})
-.RequireAuthorization(new[] { "Cliente", "Organizador" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
 // Pagar → Cliente u Organizador
 
 
@@ -598,9 +594,8 @@ orden.MapPost("/{ordenId}/cancelar", (int ordenId, IOrdenService ordenService) =
         return Results.BadRequest("No se pudo cancelar la orden (puede que ya esté pagada o no exista).");
 
     return Results.Ok(new { mesaje = "Orden cancelada" });
-})
-.RequireAuthorization(new[] { "Cliente", "Organizador" });
 
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
 #endregion
 #region Sector
 var sector = app.MapGroup("/api/sectores");
@@ -623,8 +618,8 @@ sector.MapPost("/", (ISectorService sectorService, SectorCreateDto sector) =>
 
     var id = sectorService.AgregarSector(sector);
     return Results.Created($"/api/sectores/{id}", sector);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 // Crear sector → SOLO Admin u Organizador
 
 
@@ -632,10 +627,8 @@ sector.MapGet("/", (ISectorService sectorService) =>
 {
     var sectores = sectorService.ObtenerTodo();
     return Results.Ok(sectores);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Molinete", "Cliente" });
-// Ver sectores → Cualquiera logueado
 
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 sector.MapGet("/{sectorId}", (int sectorId, ISectorService sectorService) =>
 {
@@ -643,8 +636,8 @@ sector.MapGet("/{sectorId}", (int sectorId, ISectorService sectorService) =>
     if (sector == null)
         return Results.NotFound();
     return Results.Ok(sector);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Molinete", "Cliente" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 sector.MapPut("/{sectorId}", (int sectorId, ISectorService sectorService, SectorUpdateDto sector) =>
 {
@@ -665,8 +658,8 @@ sector.MapPut("/{sectorId}", (int sectorId, ISectorService sectorService, Sector
     if (actualizado == 0)
         return Results.NotFound();
     return Results.NoContent();
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 
 sector.MapDelete("/{sectorId}", (int sectorId, ISectorService sectorService) =>
@@ -675,8 +668,8 @@ sector.MapDelete("/{sectorId}", (int sectorId, ISectorService sectorService) =>
     if (eliminado == 0)
         return Results.NotFound();
     return Results.NoContent();
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 #endregion
 #region Tarifa
@@ -700,17 +693,14 @@ tarifa.MapPost("/", (ITarifaService tarifaService, TarifaCreateDto tarifa) =>
 
     var id = tarifaService.AgregarTarifa(tarifa);
     return Results.Created($"/api/tarifas/{id}", tarifa);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 
 tarifa.MapGet("/", (ITarifaService tarifaService) =>
 {
     var tarifas = tarifaService.ObtenerTodo();
     return Results.Ok(tarifas);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Cliente", "Molinete" });
-// Ver todas las tarifas → TODOS los roles permitidos
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 tarifa.MapGet("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 {
@@ -718,8 +708,8 @@ tarifa.MapGet("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
     if (tarifa == null)
         return Results.NotFound();
     return Results.Ok(tarifa);
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador", "Cliente", "Molinete" });
+    
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 tarifa.MapPut("/{tarifaId}", (int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
 {
@@ -741,8 +731,8 @@ tarifa.MapPut("/{tarifaId}", (int tarifaId, ITarifaService tarifaService, Tarifa
         return Results.NotFound();
 
     return Results.NoContent();
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
 tarifa.MapDelete("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
 {
@@ -750,8 +740,7 @@ tarifa.MapDelete("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>
     if (eliminado == 0)
         return Results.NotFound();
     return Results.NoContent();
-})
-.RequireAuthorization(new[] { "Administrador", "Organizador" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
 #endregion
 #region Usuario
@@ -829,7 +818,6 @@ auth.MapPost("Logout", [Authorize] (IUsuarioService usuarioService, HttpContext 
 });
 
 
-// ✅ Obtener info del usuario → SOLO autenticado
 auth.MapGet("/me", [Authorize] (HttpContext http) =>
 {
     var email = http.User.FindFirstValue(ClaimTypes.Email);

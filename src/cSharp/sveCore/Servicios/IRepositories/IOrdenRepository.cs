@@ -8,5 +8,6 @@ public interface IOrdenRepository
     Orden? GetById(int id);
     int Add(Orden orden);
     int Update(Orden orden);
-    int Delete (int id);
+    int Delete(int id);
+    bool PagarOrden(int idOrden);
 }

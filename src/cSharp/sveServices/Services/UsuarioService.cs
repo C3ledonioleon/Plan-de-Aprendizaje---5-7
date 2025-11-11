@@ -91,13 +91,13 @@ public class UsuarioService : IUsuarioService
 
     private string GenerateJwtToken(Usuario usuario)
     {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings:SecretKey").Value));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings:SecretKey").Value!));
         var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
-            new Claim(ClaimTypes.Role, usuario.Rol.ToString())
+            new Claim(ClaimTypes.Role, usuario.Rol.ToString()!)
         };
 
         var token = new JwtSecurityToken(

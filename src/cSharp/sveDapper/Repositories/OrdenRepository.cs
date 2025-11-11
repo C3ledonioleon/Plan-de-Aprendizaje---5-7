@@ -1,4 +1,5 @@
 using Dapper;
+using MySql.Data.MySqlClient;
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
 using System.Data;
@@ -68,6 +69,18 @@ public class OrdenRepository : IOrdenRepository
     {
         string sql = "DELETE FROM Orden WHERE IdOrden = @IdOrden";
         int rows = _connection.Execute(sql, new { IdOrden = id });
-        return rows > 0 ? id : 0; 
+        return rows > 0 ? id : 0;
     }
+    
+        // ✅ IMPLEMENTACIÓN EXACTA QUE PEDISTE
+        public bool PagarOrden(int idOrden)
+        {
+    var result = _connection.QueryFirstOrDefault<dynamic>(
+        "CALL PagarOrden(@IdOrden);",
+        new { IdOrden = idOrden }
+    );
+
+    return result != null && result.Mensaje == "Orden pagada y entrada creada.";
+}
+
 }

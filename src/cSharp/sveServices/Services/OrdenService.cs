@@ -85,11 +85,6 @@ public class OrdenService : IOrdenService
 
     public bool PagarOrden(int ordenId)
     {
-        var orden = _ordenRepository.GetById(ordenId);
-        if (orden == null)
-            return false;
-
-        orden.Estado = EstadoOrden.Pagada;
-        return _ordenRepository.Update(orden) > 0;
+    return _ordenRepository.PagarOrden(ordenId);
     }
 }

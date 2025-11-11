@@ -54,31 +54,7 @@ namespace sve.Tests.Services
             Assert.NotNull(resultado);
             Assert.Equal(150, resultado.Precio);
         }
-
-        [Fact]
-        public void AgregarEntrada_DeberiaLlamarAddYRetornarId()
-        {
-            // Arrange
-            var dto = new EntradaCreateDto
-            {
-                Precio = 120,
-                IdOrden = 3,
-                IdTarifa = 2,
-                IdCliente = 1,
-                IdFuncion = 4
-            };
-
-            _mockRepo.Setup(r => r.Add(It.IsAny<Entrada>())).Returns(1);
-
-            // Act
-            var resultado = _service.AgregarEntrada(dto);
-
-            // Assert
-            _mockRepo.Verify(r => r.Add(It.IsAny<Entrada>()), Times.Once);
-            Assert.Equal(1, resultado);
-        }
-
-        [Fact]
+   [Fact]
         public void ActualizarEntrada_DeberiaRetornar1CuandoExiste()
         {
             // Arrange

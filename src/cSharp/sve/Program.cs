@@ -545,7 +545,7 @@ orden.MapPost("/", (OrdenCreateDto orden, IOrdenService ordenService) =>
 
     var ordenId = ordenService.AgregarOrden(orden);
     return Results.Ok(new { IdOrden = ordenId });
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario , Administrador" });
 
 orden.MapGet("/", (IOrdenService ordenService) =>
 {
@@ -575,7 +575,7 @@ orden.MapPost("/{ordenId}/pagar", (int ordenId, IOrdenService ordenService) =>
         return Results.BadRequest("No se pudo procesar el pago o la orden no existe.");
 
     return Results.Ok(new { mesaje = "Orden pagada y entradas emitidas" });
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario, Administrador" });
 // Pagar → Cliente u Organizador
 
 
@@ -588,7 +588,7 @@ orden.MapPost("/{ordenId}/cancelar", (int ordenId, IOrdenService ordenService) =
 
     return Results.Ok(new { mesaje = "Orden cancelada" });
 
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario" });
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Usuario , Administrador" });
 #endregion
 #region Sector
 var sector = app.MapGroup("/api/sectores");
@@ -823,7 +823,6 @@ auth.MapGet("/me", [Authorize] (HttpContext http) =>
 });
 
 
-// ✅ Listado de roles → CUALQUIERA puede verlos
 auth.MapGet("Roles", (IUsuarioService usuarioService) =>
 {
     var roles = Enum.GetNames(typeof(RolUsuario));

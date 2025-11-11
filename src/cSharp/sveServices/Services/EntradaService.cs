@@ -36,19 +36,6 @@ public class EntradaService : IEntradaService
         return _entradaRepository.GetById(id);
     }
 
-    public int AgregarEntrada(EntradaCreateDto entrada)
-    {
-        var nuevaEntrada = new Entrada
-        {
-            Precio = entrada.Precio,
-            IdOrden = entrada.IdOrden,
-            IdTarifa = entrada.IdTarifa,
-            Estado = EstadoEntrada.Activa,
-            IdCliente = entrada.IdCliente, 
-            IdFuncion = entrada.IdFuncion
-        };
-        return _entradaRepository.Add( nuevaEntrada);
-    }
     public int ActualizarEntrada(int id, EntradaUpdateDto entrada)
     {
          var existente = _entradaRepository.GetById(id);

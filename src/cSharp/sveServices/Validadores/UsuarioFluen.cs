@@ -22,7 +22,6 @@ namespace sveServicio.Validation
         }
     }
 
-    // ✅ Validador para login
     public class LoginDtoValidator : AbstractValidator<LoginDto>
     {
         public LoginDtoValidator()

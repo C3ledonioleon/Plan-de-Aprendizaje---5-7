@@ -27,9 +27,9 @@ public class OrdenService : IOrdenService
                 Total = orden.Total,
                 Fecha = orden.Fecha,
                 Estado = orden.Estado,
-                Cliente = orden.Cliente,  
-                Tarifa = orden.Tarifa,     
-                Entradas = orden.Entradas  
+                Cliente = orden.Cliente,
+                Tarifa = orden.Tarifa,
+                Entradas = orden.Entradas
 
             }).ToList();
     }
@@ -75,16 +75,13 @@ public class OrdenService : IOrdenService
 
     public bool CancelarOrden(int ordenId)
     {
-        var orden = _ordenRepository.GetById(ordenId);
-        if (orden == null) 
-            return false;
-
-        orden.Estado = EstadoOrden.Cancelada;
-        return _ordenRepository.Update(orden) > 0;
+      return _ordenRepository.CancelarOrden(ordenId);
     }
 
     public bool PagarOrden(int ordenId)
     {
-    return _ordenRepository.PagarOrden(ordenId);
+        return _ordenRepository.PagarOrden(ordenId);
     }
+    
+
 }

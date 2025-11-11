@@ -71,16 +71,28 @@ public class OrdenRepository : IOrdenRepository
         int rows = _connection.Execute(sql, new { IdOrden = id });
         return rows > 0 ? id : 0;
     }
-    
-        // ✅ IMPLEMENTACIÓN EXACTA QUE PEDISTE
-        public bool PagarOrden(int idOrden)
-        {
-    var result = _connection.QueryFirstOrDefault<dynamic>(
-        "CALL PagarOrden(@IdOrden);",
-        new { IdOrden = idOrden }
-    );
 
-    return result != null && result.Mensaje == "Orden pagada y entrada creada.";
-}
+    // ✅ IMPLEMENTACIÓN EXACTA QUE PEDISTE
+    public bool PagarOrden(int idOrden)
+    {
+        var result = _connection.QueryFirstOrDefault<dynamic>(
+            "CALL PagarOrden(@IdOrden);",
+            new { IdOrden = idOrden }
+        );
+
+        return result != null && result.Mensaje == "Orden pagada y entrada creada.";
+    }
+
+// ✅ Método para cancelar la orden
+    public bool CancelarOrden(int idOrden)
+    {
+        var result = _connection.QueryFirstOrDefault<dynamic>(
+            "CALL CancelarOrden(@IdOrden);",
+            new { IdOrden = idOrden }
+        );
+
+        // Comprobamos que el mensaje sea el esperado del procedimiento
+        return result != null && result.Mensaje == "Orden cancelada y stock incrementado +1.";
+    }
 
 }

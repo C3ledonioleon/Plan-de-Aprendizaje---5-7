@@ -51,3 +51,43 @@ proc_pagar: BEGIN
 END $$
 
 DELIMITER ;
+
+
+USE 5to_SVE;
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS CancelarOrden $$
+CREATE PROCEDURE CancelarOrden(IN p_IdOrden INT)
+proc_cancelar: BEGIN
+    DECLARE v_IdTarifa INT;
+
+    START TRANSACTION;
+
+    -- Obtener tarifa asociada a la orden
+    SELECT IdTarifa
+    INTO v_IdTarifa
+    FROM Orden
+    WHERE IdOrden = p_IdOrden
+    FOR UPDATE;
+
+    IF ROW_COUNT() = 0 THEN
+        ROLLBACK;
+        SELECT 'La orden no existe.' AS Mensaje;
+        LEAVE proc_cancelar;
+    END IF;
+
+    -- Aumentar stock +1
+    UPDATE Tarifa
+    SET Stock = Stock + 1
+    WHERE IdTarifa = v_IdTarifa;
+
+    -- Marcar orden como cancelada
+    UPDATE Orden
+    SET Estado = 2 -- 2 = Cancelada
+    WHERE IdOrden = p_IdOrden;
+
+    COMMIT;
+    SELECT 'Orden cancelada y stock incrementado +1.' AS Mensaje;
+END $$
+
+DELIMITER ;

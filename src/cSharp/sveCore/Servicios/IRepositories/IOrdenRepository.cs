@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using sveCore.Models;
 
 namespace sveCore.Servicio.IRepositories;
@@ -10,4 +11,5 @@ public interface IOrdenRepository
     int Update(Orden orden);
     int Delete(int id);
     bool PagarOrden(int idOrden);
+    bool CancelarOrden(int idOrden);
 }

@@ -10,9 +10,13 @@ using System.Text;
 using FluentValidation;
 using sveServicio.Validation;
 using sve.Endpoints;
+using sveDapper.Factories;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDbConnectionFactory, RoleBasedDbConnectionFactory>();
 
 builder.Services.AddServices();
 builder.Services.AddRepositories();

@@ -2,29 +2,31 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
+using sveDapper.Factories;
 using System.Data;
 
 namespace sveDapper.Repositories;
 
 public class OrdenRepository : IOrdenRepository
 {
-    private readonly IDbConnection _connection;
+    private readonly IDbConnectionFactory _connectionFactory;
     private readonly EntradaRepository entradaRepository;
 
-    public OrdenRepository(IDbConnection connection)
+    public OrdenRepository(IDbConnectionFactory connectionFactory)
     {
-        _connection = connection;
-        entradaRepository = new EntradaRepository(_connection);
+        _connectionFactory = connectionFactory;
+        entradaRepository = new EntradaRepository(_connectionFactory);
     }
 
     public List<Orden> GetAll()
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.Query<Orden>("SELECT * FROM Orden").ToList();
     }
 
     public Orden? GetById(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.QueryFirstOrDefault<Orden>(
             "SELECT * FROM Orden WHERE IdOrden = @IdOrden",
             new { IdOrden = id });
@@ -32,6 +34,7 @@ public class OrdenRepository : IOrdenRepository
 
     public int Add(Orden orden)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 INSERT INTO Orden (Total, Fecha, IdCliente, IdTarifa, Estado)
                 VALUES (@Total, @Fecha, @IdCliente, @IdTarifa, @Estado);
@@ -43,6 +46,7 @@ public class OrdenRepository : IOrdenRepository
 
     public int Update(Orden orden)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 UPDATE Orden 
                 SET Total = @Total, 
@@ -67,6 +71,7 @@ public class OrdenRepository : IOrdenRepository
 
     public int Delete(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = "DELETE FROM Orden WHERE IdOrden = @IdOrden";
         int rows = _connection.Execute(sql, new { IdOrden = id });
         return rows > 0 ? id : 0;
@@ -75,6 +80,7 @@ public class OrdenRepository : IOrdenRepository
     // ✅ IMPLEMENTACIÓN EXACTA QUE PEDISTE
     public bool PagarOrden(int idOrden)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         var result = _connection.QueryFirstOrDefault<dynamic>(
             "CALL PagarOrden(@IdOrden);",
             new { IdOrden = idOrden }
@@ -86,6 +92,7 @@ public class OrdenRepository : IOrdenRepository
 // ✅ Método para cancelar la orden
     public bool CancelarOrden(int idOrden)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         var result = _connection.QueryFirstOrDefault<dynamic>(
             "CALL CancelarOrden(@IdOrden);",
             new { IdOrden = idOrden }

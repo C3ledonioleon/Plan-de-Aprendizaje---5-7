@@ -2,25 +2,27 @@ using sveCore.Models;
 using sveCore.Servicio.IRepositories;
 using System.Data;
 using Dapper;
+using sveDapper.Factories;
 
 namespace sveDapper.Repositories;
 
 public class EntradaRepository : IEntradaRepository
 {
-    private readonly IDbConnection _connection;
+    private readonly IDbConnectionFactory _connectionFactory;
 
-    public EntradaRepository(IDbConnection connection)
+    public EntradaRepository(IDbConnectionFactory connectionFactory)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
     }
-
     public List<Entrada> GetAll()
     {
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.Query<Entrada>("SELECT * FROM Entrada").ToList();
     }
 
     public Entrada? GetById(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.QueryFirstOrDefault<Entrada>(
             "SELECT * FROM Entrada WHERE IdEntrada = @IdEntrada",
             new { IdEntrada = id });
@@ -28,7 +30,7 @@ public class EntradaRepository : IEntradaRepository
 
     public int Add(Entrada entrada)
     {
- 
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 INSERT INTO Entrada (Precio, IdCliente, IdFuncion,IdTarifa, IdOrden, Estado )
                 VALUES (@Precio, @IdCliente, @IdFuncion, @IdTarifa, @IdOrden, @Estado );
@@ -41,7 +43,7 @@ public class EntradaRepository : IEntradaRepository
 
     public int Update(Entrada entrada)
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 UPDATE Entrada 
                 SET Precio = @Precio,
@@ -57,6 +59,7 @@ public class EntradaRepository : IEntradaRepository
 
     public int Delete(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = "DELETE FROM Entrada WHERE IdEntrada = @IdEntrada";
         int rows = _connection.Execute(sql, new { IdEntrada = id });
         return rows > 0 ? id : 0;

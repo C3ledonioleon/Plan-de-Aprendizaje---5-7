@@ -1,6 +1,5 @@
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
-using System.Data;
 using Dapper;
 using sveDapper.Factories;
 

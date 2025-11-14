@@ -1,27 +1,28 @@
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
-using System.Data;
 using Dapper;
+using sveDapper.Factories;
 
 namespace sveDapper.Repositories;
 
 public class LocalRepository : ILocalRepository
 {
-    private readonly IDbConnection _connection;
+    private readonly IDbConnectionFactory _connectionFactory;
 
-    public LocalRepository(IDbConnection connection)
+    public LocalRepository(IDbConnectionFactory connectionFactory)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
     }
 
     public List<Local> GetAll()
     {
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.Query<Local>("SELECT * FROM Local").ToList();
     }
 
     public Local? GetById(int id)
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.QueryFirstOrDefault<Local>(
             "SELECT * FROM Local WHERE IdLocal = @IdLocal",
             new { IdLocal = id });
@@ -29,7 +30,7 @@ public class LocalRepository : ILocalRepository
 
     public int Add(Local local)
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 INSERT INTO Local (Nombre, Direccion, CapacidadTotal)
                 VALUES (@Nombre, @Direccion, @CapacidadTotal);
@@ -41,6 +42,7 @@ public class LocalRepository : ILocalRepository
 
     public int Update(Local local)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 UPDATE Local 
                 SET Nombre = @Nombre,
@@ -53,6 +55,7 @@ public class LocalRepository : ILocalRepository
 
     public int Delete(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = "DELETE FROM Local WHERE IdLocal = @IdLocal";
         int rows = _connection.Execute(sql, new { IdLocal = id });
         return rows  > 0 ? id : 0;

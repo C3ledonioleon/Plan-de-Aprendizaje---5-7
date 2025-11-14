@@ -1,27 +1,29 @@
 using Dapper;
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
+using sveDapper.Factories;
 using System.Data;
 
 namespace sveDapper.Repositories;
 
 public class SectorRepository : ISectorRepository
 {
-    private readonly IDbConnection _connection;
+    private readonly IDbConnectionFactory _connectionFactory;
 
-    public SectorRepository(IDbConnection connection)
+    public SectorRepository(IDbConnectionFactory connectionFactory)
     {
-        _connection = connection;
+        _connectionFactory = connectionFactory;
     }
 
     public List<Sector> GetAll()
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.Query<Sector>("SELECT * FROM Sector").ToList();
     }
 
     public Sector? GetById(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         return _connection.QueryFirstOrDefault<Sector>(
             "SELECT * FROM Sector WHERE IdSector = @IdSector",
             new { IdSector = id });
@@ -29,7 +31,7 @@ public class SectorRepository : ISectorRepository
 
     public int Add(Sector sector)
     {
-
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 INSERT INTO Sector (Nombre, Capacidad, IdLocal)
                 VALUES (@Nombre, @Capacidad, @IdLocal);
@@ -41,6 +43,7 @@ public class SectorRepository : ISectorRepository
 
     public int Update(Sector sector)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 UPDATE Sector 
                 SET Nombre = @Nombre,
@@ -53,6 +56,7 @@ public class SectorRepository : ISectorRepository
 
     public int Delete(int id)
     {
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = "DELETE FROM Sector WHERE IdSector = @IdSector";
         int rows = _connection.Execute(sql, new { IdSector = id });
         return rows > 0 ? id : 0; 

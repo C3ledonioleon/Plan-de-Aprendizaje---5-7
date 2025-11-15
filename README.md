@@ -95,9 +95,6 @@ Incluye:
 Pendiente:
 
 * Frontend
-* Swagger avanzado
-* Testing automático
-
 ---
 
 ## 📌 Estructura

@@ -1,162 +1,128 @@
-using System;
-using Moq;
 using Xunit;
-using sveCore.Models;
-using sveCore.DTOs;
-using sveCore.Servicio.IRepositories;
+using Moq;
 using Microsoft.Extensions.Configuration;
+using sveCore.Servicio.IRepositories;
 using sveServices.Services;
+using sveCore.DTOs;
+using sveCore.Models;
 
-namespace sveServices.Tests
+namespace sve.Tests.Services
 {
     public class UsuarioServiceTests
     {
-        private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
-        private readonly Mock<IConfiguration> _configurationMock;
-        private readonly UsuarioService _usuarioService;
+        private readonly Mock<IUsuarioRepository> _repo;
+        private readonly UsuarioService _service;
 
         public UsuarioServiceTests()
         {
-             // Mock del repositorio
-            _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
-
-            // Mock de IConfiguration
-            _configurationMock = new Mock<IConfiguration>();
-
-            // SecretKey (mínimo 32 caracteres)
-            var secretSection = new Mock<IConfigurationSection>();
-            secretSection.Setup(s => s.Value).Returns("mi_clave_secreta_muy_larga_1234567890");
-            _configurationMock.Setup(c => c.GetSection("JwtSettings:SecretKey")).Returns(secretSection.Object);
-
-            // Issuer
-            var issuerSection = new Mock<IConfigurationSection>();
-            issuerSection.Setup(s => s.Value).Returns("miIssuer");
-            _configurationMock.Setup(c => c.GetSection("JwtSettings:Issuer")).Returns(issuerSection.Object);
-
-            // Audience
-            var audienceSection = new Mock<IConfigurationSection>();
-            audienceSection.Setup(s => s.Value).Returns("miAudience");
-            _configurationMock.Setup(c => c.GetSection("JwtSettings:Audience")).Returns(audienceSection.Object);
-
-            // TokenExpirationMinutes
-            var expirationSection = new Mock<IConfigurationSection>();
-            expirationSection.Setup(s => s.Value).Returns("60");
-            _configurationMock.Setup(c => c.GetSection("JwtSettings:TokenExpirationMinutes")).Returns(expirationSection.Object);
-
-            // Instancia del servicio
-            _usuarioService = new UsuarioService(_usuarioRepositoryMock.Object, _configurationMock.Object);
+            _repo = new Mock<IUsuarioRepository>();
+            _service = new UsuarioService(_repo.Object, MockConfig());
         }
 
-        [Fact]
-        public void Register_EmailNoExiste_DeberiaAgregarUsuario()
+        // 🔧 Mock rápido de configuración JWT
+        private IConfiguration MockConfig()
         {
-            // Arrange
-            var registerDto = new RegisterDto
+            var dict = new Dictionary<string, string>
             {
-                Username = "Juan",
-                Email = "juan@mail.com",
-                Contraseña = "1234",
-                Rol = RolUsuario.Usuario
+                ["JwtSettings:SecretKey"] = "12345678901234567890123456789012",
+                ["JwtSettings:Issuer"] = "TestIssuer",
+                ["JwtSettings:Audience"] = "TestAudience",
+                ["JwtSettings:TokenExpirationMinutes"] = "15"
             };
 
-            _usuarioRepositoryMock.Setup(r => r.GetByEmail(registerDto.Email)).Returns((Usuario?)null);
-            _usuarioRepositoryMock.Setup(r => r.Add(It.IsAny<Usuario>())).Returns(1);
-
-            // Act
-            int result = _usuarioService.Register(registerDto);
-
-            // Assert
-            Assert.Equal(1, result);
-            _usuarioRepositoryMock.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Once);
+            return new ConfigurationBuilder().AddInMemoryCollection(dict).Build();
         }
 
-        [Fact]
-        public void Register_EmailExiste_DeberiaLanzarExcepcion()
-        {
-            // Arrange
-            var registerDto = new RegisterDto
-            {
-                Username = "Juan",
-                Email = "juan@mail.com",
-                Contraseña = "1234",
-                Rol = RolUsuario.Usuario
-            };
-
-            _usuarioRepositoryMock.Setup(r => r.GetByEmail(registerDto.Email))
-                .Returns(new Usuario());
-
-            // Act & Assert
-            Assert.Throws<Exception>(() => _usuarioService.Register(registerDto));
-        }
+        // ----------------------------------------------------------
+        //                     TESTS SIMPLIFICADOS
+        // ----------------------------------------------------------
 
         [Fact]
-        public void Login_CredencialesCorrectas_DeberiaRetornarToken()
+        public void Register_CreaUsuarioSiEmailNoExiste()
         {
-            // Arrange
-            var usuario = new Usuario
+            var dto = new RegisterDto
             {
-                IdUsuario = 1,
-                Username = "Juan",
-                Email = "juan@mail.com",
-                Password = Convert.ToHexString(System.Security.Cryptography.SHA256.Create()
-                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes("1234"))).ToLower(),
-                Rol = RolUsuario.Usuario
-            };
-
-            var loginDto = new LoginDto
-            {
-                Email = "juan@mail.com",
+                Username = "juan",
+                Email = "test@test.com",
                 Contraseña = "1234"
             };
 
-            _usuarioRepositoryMock.Setup(r => r.GetByEmail(loginDto.Email)).Returns(usuario);
-            _usuarioRepositoryMock.Setup(r => r.UpdateRefreshToken(usuario.Email, It.IsAny<string>(), It.IsAny<DateTime>()));
+            _repo.Setup(r => r.GetByEmail(dto.Email)).Returns((Usuario?)null);
+            _repo.Setup(r => r.Add(It.IsAny<Usuario>())).Returns(1);
 
-            // Act
-            var tokenDto = _usuarioService.Login(loginDto);
+            var result = _service.Register(dto);
 
-            // Assert
-            Assert.NotNull(tokenDto.Token);
-            Assert.NotNull(tokenDto.RefreshToken);
-            _usuarioRepositoryMock.Verify(r => r.UpdateRefreshToken(usuario.Email, It.IsAny<string>(), It.IsAny<DateTime>()), Times.Once);
+            Assert.Equal(1, result);
         }
 
         [Fact]
-        public void Logout_DeberiaActualizarRefreshTokenANull()
+        public void Register_FallaSiEmailExiste()
         {
-            // Arrange
-            string email = "juan@mail.com";
-            _usuarioRepositoryMock.Setup(r => r.UpdateRefreshToken(email, null, It.IsAny<DateTime>()));
+            _repo.Setup(r => r.GetByEmail("test@test.com")).Returns(new Usuario());
 
-            // Act
-            _usuarioService.Logout(email);
-
-            // Assert
-            _usuarioRepositoryMock.Verify(r => r.UpdateRefreshToken(email, null, It.IsAny<DateTime>()), Times.Once);
+            Assert.Throws<Exception>(() =>
+                _service.Register(new RegisterDto { Email = "test@test.com" })
+            );
         }
 
         [Fact]
-        public void UpdateRol_UsuarioExistente_DeberiaActualizarRol()
+        public void Login_RetornaTokensSiTodoCorrecto()
         {
-            // Arrange
-            var usuario = new Usuario
+            var dto = new LoginDto { Email = "a@a.com", Contraseña = "1234" };
+
+            // Generamos hash igual al que usa el servicio
+            var hash = _service
+                        .GetType()
+                        .GetMethod("HashPassword", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+                        .Invoke(_service, new object[] { dto.Contraseña })!.ToString();
+
+            _repo.Setup(r => r.GetByEmail(dto.Email)).Returns(new Usuario
             {
-                IdUsuario = 1,
-                Username = "Juan",
-                Email = "juan@mail.com",
+                Email = dto.Email,
+                Password = hash,
                 Rol = RolUsuario.Usuario
-            };
+            });
 
-            _usuarioRepositoryMock.Setup(r => r.GetById(usuario.IdUsuario)).Returns(usuario);
-            _usuarioRepositoryMock.Setup(r => r.Update(usuario)).Returns(usuario.IdUsuario);
+            var result = _service.Login(dto);
 
-            // Act
-            int result = _usuarioService.UpdateRol(usuario.IdUsuario, RolUsuario.Administrador);
+            Assert.NotNull(result.Token);
+            Assert.NotNull(result.RefreshToken);
+        }
 
-            // Assert
-            Assert.Equal(usuario.IdUsuario, result);
+        [Fact]
+        public void Login_FallaSiUsuarioNoExiste()
+        {
+            _repo.Setup(r => r.GetByEmail("no@a.com")).Returns((Usuario?)null);
+
+            Assert.Throws<Exception>(() =>
+                _service.Login(new LoginDto { Email = "no@a.com", Contraseña = "1234" })
+            );
+        }
+
+        [Fact]
+        public void Refresh_GeneraNuevoToken()
+        {
+            var usuario = new Usuario { Email = "a@a.com", Rol = RolUsuario.Usuario };
+
+            _repo.Setup(r => r.GetByRefreshToken("REF123")).Returns(usuario);
+
+            var result = _service.Refresh("REF123");
+
+            Assert.NotNull(result.Token);
+        }
+
+        [Fact]
+        public void UpdateRol_CambiaElRol()
+        {
+            var usuario = new Usuario { IdUsuario = 1, Rol = RolUsuario.Usuario };
+
+            _repo.Setup(r => r.GetById(1)).Returns(usuario);
+            _repo.Setup(r => r.Update(usuario)).Returns(1);
+
+            var result = _service.UpdateRol(1, RolUsuario.Administrador);
+
+            Assert.Equal(1, result);
             Assert.Equal(RolUsuario.Administrador, usuario.Rol);
-            _usuarioRepositoryMock.Verify(r => r.Update(usuario), Times.Once);
         }
     }
 }

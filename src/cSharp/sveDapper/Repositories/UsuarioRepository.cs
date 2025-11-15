@@ -2,7 +2,6 @@ using Dapper;
 using sveCore.Models;
 using sveCore.Servicio.IRepositories;
 using sveDapper.Factories;
-using System.Data;
 
 namespace sveDapper.Repositories;
 

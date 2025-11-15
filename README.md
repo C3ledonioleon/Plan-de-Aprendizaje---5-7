@@ -1,4 +1,12 @@
-## 📝 Resumen General del Proyecto
+## ✨ Integrantes
+
+* Leon Flores, Celedonio
+
+* Ramirez, Luján
+
+* Gonzalez, Sofia.
+
+## 📝 Descripcion General del Proyecto
 
 El proyecto **SVE (Sistema de Venta de Entradas)** es una aplicación backend diseñada para gestionar eventos, funciones, clientes, órdenes de compra y generación de entradas con códigos QR. El sistema implementa una arquitectura por capas clara, utilizando **.NET**, **Dapper** y **PostgreSQL**.
 
@@ -130,7 +138,7 @@ SVE.Dapper
 
 ---
 
-## 🌐 Acceso Externo con `0.0.0.0 : Es una dirección "comodín" utilizada en `launchSettings.json` para permitir que la aplicación escuche en todas las interfaces de red. Esto se emplea para que otros dispositivos dentro de la misma red local puedan acceder al Swagger o a la API.
+🌐 Acceso Externo con `0.0.0.0 : Es una dirección "comodín" utilizada en `launchSettings.json` para permitir que la aplicación escuche en todas las interfaces de red. Esto se emplea para que otros dispositivos dentro de la misma red local puedan acceder al Swagger o a la API.
 
 Sin embargo, su funcionamiento depende completamente de la configuración del router y del firewall. Si estos bloquean puertos externos, el acceso no será posible aunque se utilice 0.0.0.0.
 
@@ -143,12 +151,4 @@ http://10.120.x.x:5257
 
 ---
 
-## ✨ Integrantes
 
-* Leon Flores, Celedonio
-
-* Ramirez, Luján
-
-* Gonzalez, Sofia.
-
-*

@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using sveCore.DTOs;
-using sveCore.Models;
 using sveCore.Services.IServices;
+using sveCore.Models;
 
 namespace sve.Endpoints
 {
@@ -17,8 +18,8 @@ namespace sve.Endpoints
             {
                 var lista = entradaService.ObtenerTodo();
                 return Results.Ok(lista);
-            });
-
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Molinete,Usuario" });
+                
             // Obtener entrada por ID
             entradas.MapGet("/{entradaId}", (IEntradaService entradaService, int entradaId) =>
             {
@@ -26,7 +27,7 @@ namespace sve.Endpoints
                 if (entrada == null)
                     return Results.NotFound();
                 return Results.Ok(entrada);
-            });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Molinete,Usuario" });
 
             // Anular entrada
             entradas.MapPost("{entradaId}/anular", (IEntradaService entradaService, int entradaId) =>
@@ -34,7 +35,7 @@ namespace sve.Endpoints
                 return !entradaService.AnularEntrada(entradaId)
                     ? Results.NotFound($"No se encontró la entrada con ID {entradaId}")
                     : Results.Ok($"La entrada con ID {entradaId} fue anulada correctamente");
-            });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
             // Generar QR
             entradas.MapGet("/{entradaId}/qr", (int entradaId, IEntradaService entradaService, IQRService qrService, IOrdenService ordenService) =>
@@ -54,7 +55,7 @@ namespace sve.Endpoints
                 var qrBytes = qrService.GenerarQR(contenido);
 
                 return Results.File(qrBytes, "image/png");
-            });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
 
             // Validar QR
             entradas.MapPost("/qr/validar", (QRValidacionDto qrDto, IEntradaService entradaService) =>
@@ -64,7 +65,7 @@ namespace sve.Endpoints
 
                 var resultado = entradaService.ValidarQR(qrDto.Contenido);
                 return Results.Ok(new { resultado });
-            });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Molinete,Organizador" });
         }
     }
 }

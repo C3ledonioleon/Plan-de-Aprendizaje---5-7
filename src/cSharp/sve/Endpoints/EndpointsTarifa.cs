@@ -3,6 +3,7 @@ using sveCore.DTOs;
 using sveCore.Services.IServices;
 using System.Data;
 using sveServicio.Validation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace sve.Endpoints
 {
@@ -53,7 +54,7 @@ namespace sve.Endpoints
             }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
             // Actualizar tarifa
-            tarifa.MapPut("/{tarifaId}", (int tarifaId, ITarifaService tarifaService, TarifaUpdateDto tarifa) =>
+            tarifa.MapPut("/{tarifaId}", (int tarifaId, ITarifaService tarifaService, [FromBody]  TarifaUpdateDto tarifa) =>
             {
                 var validadorTarifa = new ActualizarTarifa();
                 var result = validadorTarifa.Validate(tarifa);
@@ -74,7 +75,7 @@ namespace sve.Endpoints
 
                 return Results.NoContent();
 
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
 
             // Eliminar tarifa
             tarifa.MapDelete("/{tarifaId}", (int tarifaId, ITarifaService tarifaService) =>

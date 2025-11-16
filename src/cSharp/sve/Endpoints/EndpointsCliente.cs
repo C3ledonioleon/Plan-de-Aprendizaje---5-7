@@ -29,7 +29,7 @@ namespace sve.Endpoints
                 }
 
                 var id = clienteService.AgregarCliente(cliente);
-                return Results.Created($"/api/clientes/{id}", cliente);
+                return Results.Created($"/api/clientes/{id}", new {IdCliente = id, Cliente = cliente});
 
             }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
 
@@ -37,7 +37,7 @@ namespace sve.Endpoints
             {
                 var lista = clienteService.ObtenerTodo();
                 return Results.Ok(lista);
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Usuario" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador" });
 
             cliente.MapGet("/{clienteId}", (IClienteService clienteService, int clienteId) =>
             {

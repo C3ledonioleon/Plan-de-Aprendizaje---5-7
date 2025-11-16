@@ -82,7 +82,7 @@ public class UsuarioRepository : IUsuarioRepository
 
     public void UpdateRefreshToken(string email, string refreshToken, DateTime expiracion)
     { 
-         using var _connection = _connectionFactory.CreateConnection();
+        using var _connection = _connectionFactory.CreateConnection();
         string sql = @"
                 UPDATE Usuario 
                 SET RefreshToken = @RefreshToken, 

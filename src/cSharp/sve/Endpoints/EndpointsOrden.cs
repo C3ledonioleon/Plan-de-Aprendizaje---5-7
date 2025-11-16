@@ -50,7 +50,7 @@ namespace sve.Endpoints
                     return Results.NotFound();
                 return Results.Ok(ordenDb);
 
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Molinete" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Molinete,Usuario" });
 
             // Pagar orden
             orden.MapPost("/{ordenId}/pagar", (int ordenId, IOrdenService ordenService) =>

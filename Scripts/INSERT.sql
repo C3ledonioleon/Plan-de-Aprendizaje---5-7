@@ -1,11 +1,12 @@
+
 -- Inserts para Usuario
 INSERT INTO Usuario ( Username, password ,Email,Rol) VALUES
-('juan123', 'pass1', 'juan123@gmail.com',2),
-('maria88', 'pass2', 'maria88@gmail.com',2),
-('carlos22', 'pass3', 'carlos22@gmail.com',3),
-('sofia07', 'pass4', 'sofia07@gmail.com',3),
-('luisito', 'pass5', 'luisito@gmail.com',3),
-('pele', 'adminpass', 'pele@gmail.com',2);
+('juan123', 'e604fb2072c286d1fb6378c5cde74ca0c99f3ba1d9f4cef58969020efbc2382e', 'juan123@gmail.com',2),
+('maria88', '42ca698f4ea60cb496520cadbdde9311e33a6319abf4cc5d6aa64e12d0f91fb3', 'maria88@gmail.com',2),
+('carlos22', '979ee686a0878d9f88269a5c9dfb6abd5d07b673f138c282da7273ade9bc2667', 'carlos22@gmail.com',4),
+('sofia07', '98bdfc8be9c6cac3f8220483a74a64883572f76a27ad0c92dc3f383d1751ae56', 'sofia07@gmail.com',3),
+('luisito', '8f548bcfda9eaaa10b89a984a4be0f1074d17b5ddc90068deb2ad6f190c717b3', 'luisito@gmail.com',3),
+('pele', '7d02119ac0f0eaf35cae30b584e85ea59d12d035c5abc93b4e8183a379ef8f9c', 'pele@gmail.com',2);
 
 
 -- Inserts para Cliente

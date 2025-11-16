@@ -45,7 +45,7 @@ namespace sve.Endpoints
 
                 return Results.Ok(funciones);
 
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
             // Obtener función por ID
             funcion.MapGet("/{funcionId}", (int funcionId, IFuncionService funcionService) =>

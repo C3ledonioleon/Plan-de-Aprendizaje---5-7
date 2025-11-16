@@ -40,7 +40,7 @@ namespace sve.Endpoints
                 var locales = localService.ObtenerTodo();
                 return Results.Ok(locales);
 
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario" });
 
             // Obtener local por ID (ADMIN + Organizador)
             local.MapGet("/{localId}", (int localId, ILocalService localService) =>
@@ -50,7 +50,7 @@ namespace sve.Endpoints
                     return Results.NotFound();
                 return Results.Ok(localEncontrado);
 
-            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador" });
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario" });
 
             // Actualizar local (ADMIN + Organizador)
             local.MapPut("/{localId}", (int localId, ILocalService localService, LocalUpdateDto local) =>

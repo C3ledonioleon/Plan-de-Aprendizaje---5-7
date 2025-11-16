@@ -6,6 +6,7 @@ namespace sveCore.DTOs
 {
     public class OrdenCreateDto
     {
+        
         public int IdTarifa { get; set; }
         public int IdCliente { get; set; }
         public decimal Total { get; set; }

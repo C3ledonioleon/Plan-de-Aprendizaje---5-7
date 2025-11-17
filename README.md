@@ -118,6 +118,10 @@ SVE.Core
 SVE.Dapper
 ├── Repositories
 └── ConnectionFactory
+
+SVE.Services
+├── Services
+└── Validadores
 ```
 
 ---
@@ -126,10 +130,11 @@ SVE.Dapper
 
 ```json
 "Users": {
+  "myBD" "Server=localhost;Uid=root;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Administrador": "Server=localhost;Uid=administrador;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Cliente": "Server=localhost;Uid=cliente;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Organizador": "Server=localhost;Uid=organizador;Pwd=contraseniaNueva;Database=bd_boleteria;",
-  "Default": "Server=localhost;Uid=default;Pwd=contraseniaNueva;Database=bd_boleteria;"
+  "Molinete": "Server=localhost;Uid=molinete;Pwd=contraseniaNueva;Database=bd_boleteria;"
 }
 ```
 

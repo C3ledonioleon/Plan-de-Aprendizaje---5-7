@@ -130,7 +130,7 @@ SVE.Services
 
 ```json
 "Users": {
-  "myBD" "Server=localhost;Uid=root;Pwd=contraseniaNueva;Database=bd_boleteria;",
+  "myBD": "Server=localhost;Uid=root;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Administrador": "Server=localhost;Uid=administrador;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Cliente": "Server=localhost;Uid=cliente;Pwd=contraseniaNueva;Database=bd_boleteria;",
   "Organizador": "Server=localhost;Uid=organizador;Pwd=contraseniaNueva;Database=bd_boleteria;",

@@ -5,6 +5,7 @@ namespace sveCore.Services.IServices;
 
 public interface IUsuarioService
 {
+    List<Usuario> ObtenerTodo();
     Usuario? GetById(int idUsuario);
     TokenDto Login(LoginDto loginDto);
     void Logout(string email);

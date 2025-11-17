@@ -95,6 +95,13 @@ namespace sve.Endpoints
 
                 return Results.Ok(new { email, rol });
             });
+                // Obtener todas las tarifas
+            auth.MapGet("/", (IUsuarioService usuarioService) =>
+            {
+                var usuario = usuarioService.ObtenerTodo();
+                return Results.Ok(usuario);
+
+            }).RequireAuthorization(new AuthorizeAttribute { Roles = "Administrador,Organizador,Usuario,Molinete" });
 
             // Obtener roles disponibles
             auth.MapGet("Roles", (IUsuarioService usuarioService) =>

@@ -84,6 +84,20 @@ public class UsuarioService : IUsuarioService
         _usuarioRepository.UpdateRefreshToken(email, null, DateTime.UtcNow);
     }
 
+        public List<Usuario> ObtenerTodo()
+    {
+        return _usuarioRepository.GetAll()
+            .Select(usuario => new Usuario
+            {
+                IdUsuario = usuario.IdUsuario,
+                Username = usuario.Username,
+                Email = usuario.Email,
+                //Password = usuario.Password,
+                Rol = usuario.Rol
+            }).ToList();
+    }
+
+
     public Usuario? GetById(int idUsuario)
     {
         return _usuarioRepository.GetById(idUsuario);
